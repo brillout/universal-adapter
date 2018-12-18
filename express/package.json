@@ -7,5 +7,8 @@
     "reassert": "^1.1.16"
   },
   "description": "Universal Server Adapter - Express",
-  "repository": "github:brillout/universal-adapter"
+  "repository": "github:brillout/universal-adapter",
+  "publishConfig": {
+    "access": "public"
+  }
 }
