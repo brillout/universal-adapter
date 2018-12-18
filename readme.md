@@ -7,7 +7,7 @@
 
     WARNING, READ THIS.
     This is a computed file. Do not edit.
-    Edit `/helpers/universal-adapter/readme.template.md` instead.
+    Edit `/readme.template.md` instead.
 
 
 
@@ -22,7 +22,7 @@
 
     WARNING, READ THIS.
     This is a computed file. Do not edit.
-    Edit `/helpers/universal-adapter/readme.template.md` instead.
+    Edit `/readme.template.md` instead.
 
 
 
@@ -37,7 +37,7 @@
 
     WARNING, READ THIS.
     This is a computed file. Do not edit.
-    Edit `/helpers/universal-adapter/readme.template.md` instead.
+    Edit `/readme.template.md` instead.
 
 
 
@@ -52,7 +52,7 @@
 
     WARNING, READ THIS.
     This is a computed file. Do not edit.
-    Edit `/helpers/universal-adapter/readme.template.md` instead.
+    Edit `/readme.template.md` instead.
 
 
 
@@ -67,7 +67,7 @@
 
     WARNING, READ THIS.
     This is a computed file. Do not edit.
-    Edit `/helpers/universal-adapter/readme.template.md` instead.
+    Edit `/readme.template.md` instead.
 
 
 
@@ -102,7 +102,7 @@ The server adapters allows you to integrate with several server frameworks at on
 We define routes `/` and `/hello/{name}` that will work with Express, Hapi, and Koa:
 
 ~~~js
-// /helpers/universal-adapter/server/example/helloPlug.js
+// /server/example/helloPlug.js
 
 const parseUri = require('@brillout/parse-uri');
 const computeHash = require('./computeHash');
@@ -143,7 +143,7 @@ async function helloPlug(requestContext) {
 We can now use `helloPlug` with either Express, Hapi, or Koa:
 
 ~~~js
-// /helpers/universal-adapter/server/example/express
+// /server/example/express
 
 const express = require('express');
 const ExpressAdater = require('@universal-adapter/express');
@@ -164,7 +164,7 @@ function start() {
 }
 ~~~
 ~~~js
-// /helpers/universal-adapter/server/example/hapi
+// /server/example/hapi
 
 const Hapi = require('hapi');
 const HapiAdapter = require('@universal-adapter/hapi');
@@ -189,7 +189,7 @@ async function start() {
 }
 ~~~
 ~~~js
-// /helpers/universal-adapter/server/example/koa
+// /server/example/koa
 
 const Koa = require('koa');
 const KoaAdapter = require('@universal-adapter/koa');
@@ -221,7 +221,7 @@ function start() {
 
     WARNING, READ THIS.
     This is a computed file. Do not edit.
-    Edit `/helpers/universal-adapter/readme.template.md` instead.
+    Edit `/readme.template.md` instead.
 
 
 
@@ -236,7 +236,7 @@ function start() {
 
     WARNING, READ THIS.
     This is a computed file. Do not edit.
-    Edit `/helpers/universal-adapter/readme.template.md` instead.
+    Edit `/readme.template.md` instead.
 
 
 
@@ -251,7 +251,7 @@ function start() {
 
     WARNING, READ THIS.
     This is a computed file. Do not edit.
-    Edit `/helpers/universal-adapter/readme.template.md` instead.
+    Edit `/readme.template.md` instead.
 
 
 
@@ -266,7 +266,7 @@ function start() {
 
     WARNING, READ THIS.
     This is a computed file. Do not edit.
-    Edit `/helpers/universal-adapter/readme.template.md` instead.
+    Edit `/readme.template.md` instead.
 
 
 
@@ -281,7 +281,7 @@ function start() {
 
     WARNING, READ THIS.
     This is a computed file. Do not edit.
-    Edit `/helpers/universal-adapter/readme.template.md` instead.
+    Edit `/readme.template.md` instead.
 
 
 
