@@ -37,10 +37,10 @@ function ExpressAdapter(handlers, {addRequestContext}={}) {
   }
 
   async function handleResponse(req, res) {
-    if( alreadyServed(res) ) {
-      return;
-    }
     try {
+      if( alreadyServed(res) ) {
+        return;
+      }
       await buildResponse({requestHandlers, req, res, addRequestContext});
     } catch(err) {
       return err;
