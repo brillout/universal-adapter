@@ -13,21 +13,14 @@ function KoaAdapter(handlers, {addRequestContext}={}) {
 
   const router = new Router();
 
-  router.get('*', async (ctx, next) => {
-    const err = await handleResponse(ctx);
-    return next(err);
+  router.all('*', async (ctx, next) => {
+    await buildResponse({requestHandlers, ctx, addRequestContext});
+    // More infos about `next()`:
+    //  - https://github.com/koajs/koa/blob/master/docs/guide.md#response-middleware
+    await next();
   });
 
   return router.routes();
-
-  async function handleResponse(ctx) {
-    try {
-      await buildResponse({requestHandlers, ctx, addRequestContext});
-    } catch(err) {
-      console.error(err);
-      return err;
-    }
-  }
 }
 
 async function buildResponse({requestHandlers, ctx, addRequestContext}) {
