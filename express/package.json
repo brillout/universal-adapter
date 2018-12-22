@@ -1,9 +1,9 @@
 {
   "name": "@universal-adapter/express",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "ExpressAdapter.js",
   "dependencies": {
-    "@universal-adapter/server": "0.1.1",
+    "@universal-adapter/server": "0.1.2",
     "reassert": "^1.1.16"
   },
   "description": "Universal Server Adapter - Express",
