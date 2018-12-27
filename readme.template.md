@@ -19,17 +19,17 @@ The server adapters allow you to write server code that can work with several se
 We define routes `/` and `/hello/{name}` that will work with Express, Hapi, and Koa:
 
 ~~~js
-!INLINE ./server/example/helloPlug.js
+!INLINE ./example/helloPlug.js
 ~~~
 
 We can now use `helloPlug` with either Express, Hapi, or Koa:
 
 ~~~js
-!INLINE ./server/example/express
+!INLINE ./example/express
 ~~~
 ~~~js
-!INLINE ./server/example/hapi
+!INLINE ./example/hapi
 ~~~
 ~~~js
-!INLINE ./server/example/koa
+!INLINE ./example/koa
 ~~~

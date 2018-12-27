@@ -20,7 +20,7 @@
     "hapi",
     "koa",
     "server",
-    "server/example",
+    "example",
     "typeorm"
   ]
 }

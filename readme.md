@@ -78,20 +78,13 @@
 
 # `@universal-adapter`
 
-`@universal-adapter` is about abstracting away differences of libraries that, on a high-level, do the same thing.
+Like adapters for power outlet, but for JavaScript.
 
-The goal is to allow library authors to integrate with several libraries at once.
-
-Instead of developing against n different interfaces,
-a library author can develop against a single abstract interface.
-
-Like universal adapters of power outlets but for JavaScript.
 For now, there are only adapters for server frameworks (Express, Hapi, Koa).
-Adapters for other use cases could emerge in the future.
 
 ## Server adapters
 
-The server adapters allows you to integrate with several server frameworks at once.
+The server adapters allow you to write server code that can work with several server frameworks.
 
  - Express adapter: `@universal-adapter/express`
  - Hapi adapter: `@universal-adapter/hapi`
@@ -102,40 +95,19 @@ The server adapters allows you to integrate with several server frameworks at on
 We define routes `/` and `/hello/{name}` that will work with Express, Hapi, and Koa:
 
 ~~~js
-// /server/example/helloPlug.js
-
-const parseUri = require('@brillout/parse-uri');
-const computeHash = require('./computeHash');
+// /example/helloPlug.js
 
 module.exports = helloPlug;
 
-async function helloPlug(requestContext) {
-  const {url, method} = requestContext;
-  const {pathname} = parseUri(url);
-
-  if( method!=='GET' ) {
+async function helloPlug({url, method}) {
+  if( method!=='GET' || !url.startsWith('/hello/') ) {
     return null;
   }
-  if( pathname==='/' ) {
-    return {
-      body: [
-        "<html>",
-        "<a href='/hello/alice'>/hello/alice</a>",
-        "<br/>",
-        "<a href='/hello/jon'>/hello/jon</a>",
-        "</html>",
-      ].join('\n')
-    }
-  }
-  if( !pathname.startsWith('/hello/') ) {
-    return null;
-  }
-  const body = 'hello '+pathname.slice('/hello/'.length);
   return {
-    body,
+    body: 'hello '+url.slice('/hello/'.length),
     headers: [
-      {name: 'ETag', value: '"'+computeHash(body)+'"'},
-    ],
+      {name: 'Cache-Control', value: 'public, max-age=31536000, immutable'}
+    ]
   };
 }
 ~~~
@@ -143,7 +115,7 @@ async function helloPlug(requestContext) {
 We can now use `helloPlug` with either Express, Hapi, or Koa:
 
 ~~~js
-// /server/example/express
+// /example/express
 
 const express = require('express');
 const ExpressAdater = require('@universal-adapter/express');
@@ -164,7 +136,7 @@ function start() {
 }
 ~~~
 ~~~js
-// /server/example/hapi
+// /example/hapi
 
 const Hapi = require('hapi');
 const HapiAdapter = require('@universal-adapter/hapi');
@@ -189,7 +161,7 @@ async function start() {
 }
 ~~~
 ~~~js
-// /server/example/koa
+// /example/koa
 
 const Koa = require('koa');
 const KoaAdapter = require('@universal-adapter/koa');
