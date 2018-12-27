@@ -2,20 +2,13 @@
 
 # `@universal-adapter`
 
-`@universal-adapter` is about abstracting away differences of libraries that, on a high-level, do the same thing.
+Like adapters for power outlet, but for JavaScript.
 
-The goal is to allow library authors to integrate with several libraries at once.
-
-Instead of developing against n different interfaces,
-a library author can develop against a single abstract interface.
-
-Like universal adapters of power outlets but for JavaScript.
 For now, there are only adapters for server frameworks (Express, Hapi, Koa).
-Adapters for other use cases could emerge in the future.
 
 ## Server adapters
 
-The server adapters allows you to integrate with several server frameworks at once.
+The server adapters allow you to write server code that can work with several server frameworks.
 
  - Express adapter: `@universal-adapter/express`
  - Hapi adapter: `@universal-adapter/hapi`
