@@ -42,6 +42,7 @@ function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
   return HapiPlugin;
 
   async function catchAllRoute(request, h) {
+
     // TODO re-work this
     if( isAlreadyServed(request) ) {
         return h.continue;
@@ -90,7 +91,7 @@ async function buildResponse({requestHandlers, request, h, addRequestContext}) {
         continue;
       }
 
-      const {body, headers, redirect, statusCode, etag} = responseObject;
+      const {body, headers, redirect, statusCode, etag, type} = responseObject;
 
       const resp = h.response(body);
 
@@ -110,6 +111,10 @@ async function buildResponse({requestHandlers, request, h, addRequestContext}) {
 
       if( statusCode ) {
         resp.code(statusCode);
+      }
+
+      if( type ) {
+        resp.type(type);
       }
 
       return resp;

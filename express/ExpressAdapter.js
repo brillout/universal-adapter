@@ -67,13 +67,17 @@ async function buildResponse({requestHandlers, req, res, addRequestContext}) {
         continue;
       }
 
-      const {body, headers, redirect, statusCode/*, etag*/} = responseObject;
+      const {body, headers, redirect, statusCode/*, etag*/, type} = responseObject;
 
       assert.internal(!res.headersSent);
       headers.forEach(({name, value}) => res.set(name, value));
 
       if( statusCode ) {
         res.status(statusCode);
+      }
+
+      if( type ) {
+        res.type(type);
       }
 
       if( redirect ) {

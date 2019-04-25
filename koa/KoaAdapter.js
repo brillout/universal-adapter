@@ -38,7 +38,7 @@ async function buildResponse({requestHandlers, ctx, addRequestContext}) {
       continue;
     }
 
-    const {body, headers, redirect, statusCode, etag} = responseObject;
+    const {body, headers, redirect, statusCode, etag, type} = responseObject;
 
     headers.forEach(header => ctx.set(header.name, header.value));
 
@@ -53,6 +53,10 @@ async function buildResponse({requestHandlers, ctx, addRequestContext}) {
 
     if( statusCode ) {
       ctx.status = statusCode;
+    }
+
+    if( type ) {
+      ctx.type = type;
     }
 
     ctx.body = body;

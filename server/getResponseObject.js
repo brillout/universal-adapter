@@ -9,10 +9,11 @@ function getResponseObject(responseSpec, {extractEtagHeader=false}={}) {
 
   Object.keys(responseSpec)
   .forEach(respArg => {
-    const argList = ['body', 'headers', 'redirect', 'statusCode'];
+    const argList = ['body', 'headers', 'redirect', 'statusCode', 'type'];
     assert.usage(
       argList.includes(respArg),
       responseSpec,
+      Object.keys(responseSpec),
       "Unknown argument `"+respArg+"` in response object printed above.",
       "The list of known arguments is:",
       argList
@@ -71,6 +72,16 @@ function getResponseObject(responseSpec, {extractEtagHeader=false}={}) {
       redirect,
     );
     responseObject.redirect = redirect;
+  }
+
+  {
+    const {type} = responseSpec;
+    assert.warning(
+      type===undefined || type && type.constructor===String,
+      "response `type` is not a String",
+      type,
+    );
+    responseObject.type = type;
   }
 
   assert.warning(
