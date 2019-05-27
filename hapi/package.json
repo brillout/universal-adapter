@@ -1,9 +1,9 @@
 {
   "name": "@universal-adapter/hapi",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "main": "HapiAdapter.js",
   "dependencies": {
-    "@universal-adapter/server": "0.1.2",
+    "@universal-adapter/server": "0.2.0",
     "boom": "^7.2.0",
     "reassert": "^1.1.16"
   },

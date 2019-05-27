@@ -1,6 +1,6 @@
 {
   "name": "@universal-adapter/server",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "dependencies": {
     "@brillout/parse-uri": "^0.1.1",
     "express": "^4.16.4",
