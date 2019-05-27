@@ -3,9 +3,17 @@ const assert = require('reassert');
 module.exports = getRequestHandlers;
 
 function getRequestHandlers(handlers) {
-  assert.usage(handlers && (isCallable(handlers) || handlers.constructor===Array));
+  assert.usage(
+    handlers && (isCallable(handlers) || handlers.constructor===Array),
+    {handlers},
+    "The `handlers` argument should either be an array or a function that returns an array.",
+  );
   const handlerList = isCallable(handlers) ? handlers() : handlers;
-  assert.usage(handlers && handlers.constructor===Array);
+  assert.usage(
+    handlerList && handlerList.constructor===Array,
+    {handlerList},
+    "Your handler function should return an array.",
+  );
 
   const requestHandlers = [];
   const paramHandlers = [];
@@ -56,7 +64,8 @@ function getRequestHandlers(handlers) {
   sortHandlers(paramHandlers);
   sortHandlers(onServerCloseHandlers);
 
-  return {requestHandlers, paramHandlers, onServerCloseHandlers};
+//return {requestHandlers, paramHandlers, onServerCloseHandlers};
+  return requestHandlers;
 }
 function isCallable(thing) {
   return typeof thing === "function";
