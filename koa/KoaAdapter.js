@@ -1,19 +1,15 @@
 const Router = require('koa-router');
 const getResponseObject = require('@universal-adapter/server/getResponseObject');
-const getHandlers = require('@universal-adapter/server/getHandlers');
+const getRequestHandlers = require('@universal-adapter/server/getRequestHandlers');
 const assert = require('reassert');
 
+
 module.exports = KoaAdapter;
-module.exports.buildResponse = buildResponse;
+// module.exports.buildResponse = buildResponse;
 
-function KoaAdapter(handlers, {addRequestContext}={}) {
-  const {requestHandlers, paramHandlers, onServerCloseHandlers} = getHandlers(handlers);
-  assert_notImplemented(onServerCloseHandlers.length===0);
-  assert_notImplemented(paramHandlers.length===0);
-
-  const router = new Router();
-
+function KoaAdapter(handlers, {addRequestContext}={}) { const router = new Router();
   router.all('*', async (ctx, next) => {
+    const requestHandlers = getRequestHandlers(handlers);
     await buildResponse({requestHandlers, ctx, addRequestContext});
     // More infos about `next()`:
     //  - https://github.com/koajs/koa/blob/master/docs/guide.md#response-middleware
@@ -113,6 +109,3 @@ function getRequestContext({ctx, addRequestContext}) {
   }
 }
 
-function assert_notImplemented(val) {
-  assert.internal(val, 'NOT-IMPLEMENTED');
-}

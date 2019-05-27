@@ -1,15 +1,12 @@
 const Boom = require('boom');
 const assert = require('reassert');
 const getResponseObject = require('@universal-adapter/server/getResponseObject');
-const getHandlers = require('@universal-adapter/server/getHandlers');
+const getRequestHandlers = require('@universal-adapter/server/getRequestHandlers');
 
 module.exports = HapiAdapter;
-module.exports.buildResponse = buildResponse;
+// module.exports.buildResponse = buildResponse;
 
 function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
-  const {requestHandlers, paramHandlers, onServerCloseHandlers} = getHandlers(handlers);
-  assert_notImplemented(paramHandlers.length===0)
-
   const HapiPlugin = {
     name: 'HapiAdapter',
     multiple: false,
@@ -26,16 +23,20 @@ function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
 
       /*
       server.ext('onRequest', async (request, h) => {
+        const {paramHandlers} = getRequestHandlers(handlers);
         await addParameters({paramHandlers, request, addRequestContext});
         return h.continue;
       });
       */
 
+      /* It could be better to not support this feature
       server.ext('onPostStop', async () => {
+        const {onServerCloseHandlers} = getRequestHandlers(handlers);
         for(const cb of onServerCloseHandlers) {
           await cb();
         }
       });
+      */
     },
   };
 
@@ -48,6 +49,7 @@ function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
         return h.continue;
     }
 
+    const requestHandlers = getRequestHandlers(handlers);
     const resp = await buildResponse({requestHandlers, request, h, addRequestContext});
     if( resp === null ) {
       throw Boom.notFound(null, {});
@@ -64,6 +66,7 @@ function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
     // The payload (aka POST request body) doesn't seem to be available at `onPreResponse`.
     // console.log('where is my payload?', request.payload, request.body);
 
+    const requestHandlers = getRequestHandlers(handlers);
     const resp = await buildResponse({requestHandlers, request, h, addRequestContext});
     if( resp === null ) {
       return h.continue;
@@ -123,9 +126,8 @@ async function buildResponse({requestHandlers, request, h, addRequestContext}) {
     return null;
 }
 
+/*
 async function addParameters({paramHandlers, request, addRequestContext}) {
-  assert_notImplemented(false);
-  /*
   assert.usage(paramHandlers);
   assert.usage(request && request.raw && request.raw.req);
 
@@ -137,8 +139,8 @@ async function addParameters({paramHandlers, request, addRequestContext}) {
     assert.usage(newParams===null || newParams && newParams.constructor===Object);
     Object.assign(request, newParams);
   }
-  */
 }
+*/
 
 function getRequestContext({request, addRequestContext}) {
   const url = getRequestUrl();
@@ -261,7 +263,3 @@ function getBodyPayload(req) {
     return promise;
 }
 */
-
-function assert_notImplemented(val) {
-  assert.internal(val, 'NOT-IMPLEMENTED');
-}

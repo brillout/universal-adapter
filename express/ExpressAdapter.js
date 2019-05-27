@@ -1,15 +1,13 @@
 const assert = require('reassert');
 const getResponseObject = require('@universal-adapter/server/getResponseObject');
-const getHandlers = require('@universal-adapter/server/getHandlers');
+const getRequestHandlers = require('@universal-adapter/server/getRequestHandlers');
 
 module.exports = ExpressAdapter;
-module.exports.buildResponse = buildResponse;
+// module.exports.buildResponse = buildResponse;
 
 function ExpressAdapter(handlers, {addRequestContext}={}) {
-  const {requestHandlers, paramHandlers, onServerCloseHandlers} = getHandlers(handlers);
-  assert_notImplemented(paramHandlers.length===0)
 
-  Object.assign(universalAdapter, {universalAdapter, addParams, serveContent, onServerClose});
+//Object.assign(universalAdapter, {universalAdapter, addParams, serveContent, onServerClose});
 
   return universalAdapter;
 
@@ -20,6 +18,7 @@ function ExpressAdapter(handlers, {addRequestContext}={}) {
     next(err);
   }
 
+  /*
   async function addParams(req, res, next) {
     await addParameters({paramHandlers, req});
     next();
@@ -35,8 +34,10 @@ function ExpressAdapter(handlers, {addRequestContext}={}) {
       await cb();
     }
   }
+  */
 
   async function handleResponse(req, res) {
+    const requestHandlers = getRequestHandlers(handlers);
     try {
       if( alreadyServed(res) ) {
         return;
@@ -91,9 +92,8 @@ async function buildResponse({requestHandlers, req, res, addRequestContext}) {
     return false;
 }
 
+/*
 async function addParameters({paramHandlers, req}) {
-  assert_notImplemented(false);
-  /*
   assert.usage(paramHandlers);
   assert.usage(req);
 
@@ -105,8 +105,8 @@ async function addParameters({paramHandlers, req}) {
     assert.usage(newParams===null || newParams && newParams.constructor===Object);
     Object.assign(req, newParams);
   }
-  */
 }
+*/
 
 function getRequestContext({req, addRequestContext}) {
   const url = getRequestUrl();
@@ -153,8 +153,4 @@ function getRequestContext({req, addRequestContext}) {
 
 function alreadyServed(res) {
   return !!res.headersSent;
-}
-
-function assert_notImplemented(val) {
-  assert.internal(val, 'NOT-IMPLEMENTED');
 }

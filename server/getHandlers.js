@@ -1,10 +1,11 @@
 const assert = require('reassert');
 
-module.exports = getHandlers;
+module.exports = getRequestHandlers;
 
-function getHandlers(handlers) {
-  assert.internal(handlers && (isCallable(handlers) || handlers.constructor===Array));
-  const handlerList = isCallable(handlers) ? [handlers] : handlers;
+function getRequestHandlers(handlers) {
+  assert.usage(handlers && (isCallable(handlers) || handlers.constructor===Array));
+  const handlerList = isCallable(handlers) ? handlers() : handlers;
+  assert.usage(handlers && handlers.constructor===Array);
 
   const requestHandlers = [];
   const paramHandlers = [];
@@ -34,6 +35,7 @@ function getHandlers(handlers) {
       }
       assert.usage(isCallable(handler), handlerSpec, handler, handlerName);
       if( handlerName==='paramHandler' ) {
+        assert_notImplemented(false);
         paramHandlers.push(handler);
         return;
       }
@@ -42,6 +44,7 @@ function getHandlers(handlers) {
         return;
       }
       if( handlerName==='onServerCloseHandler' ) {
+        assert_notImplemented(false);
         onServerCloseHandlers.push(handler);
         return;
       }
@@ -74,3 +77,6 @@ function sortHandlers(handlers) {
   );
 }
 
+function assert_notImplemented(val) {
+  assert.internal(val, 'NOT-IMPLEMENTED');
+}
