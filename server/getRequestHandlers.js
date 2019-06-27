@@ -1,4 +1,5 @@
 const assert = require('reassert');
+const parseUrl = require('@brillout/parse-url');
 
 module.exports = getRequestHandlers;
 
@@ -12,9 +13,35 @@ function getRequestHandlers(handlers) {
   assert.usage(
     handlerList && handlerList.constructor===Array,
     {handlerList},
-    "Your handler function should return an array.",
+    "Your handlers function should return an array.",
   );
 
+  const requestHandlers = [];
+
+  handlerList.forEach(handler => {
+    assert.usage(isCallable(handler));
+    // TODO - rename requestContext to requestObject
+    const requestHandler = function(requestObject) {
+      assert.internal(arguments.length===1);
+      assert_requestObject(requestObject);
+      const urlProps = parseUrl(requestObject.url);
+      return handler({
+        ...requestObject,
+        ...urlProps,
+        __sources: {
+          requestObject,
+          urlProps,
+        },
+      });
+    };
+    requestHandlers.push(requestHandler);
+  });
+
+  sortHandlers(requestHandlers);
+
+  return requestHandlers;
+
+  /*
   const requestHandlers = [];
   const paramHandlers = [];
   const onServerCloseHandlers = [];
@@ -64,9 +91,14 @@ function getRequestHandlers(handlers) {
   sortHandlers(paramHandlers);
   sortHandlers(onServerCloseHandlers);
 
-//return {requestHandlers, paramHandlers, onServerCloseHandlers};
-  return requestHandlers;
+  return {requestHandlers, paramHandlers, onServerCloseHandlers};
+
+  function assert_notImplemented(val) {
+    assert.internal(val, 'NOT-IMPLEMENTED');
+  }
+  */
 }
+
 function isCallable(thing) {
   return typeof thing === "function";
 }
@@ -86,6 +118,31 @@ function sortHandlers(handlers) {
   );
 }
 
-function assert_notImplemented(val) {
-  assert.internal(val, 'NOT-IMPLEMENTED');
+function assert_requestObject(requestObject) {
+  assert.internal('body' in requestObject);
+
+  // `headers` should be an array,
+  // but server frameworks seem to always return an object instead.
+  assert.internal(requestObject.headers.constructor===Object);
+
+  assert.internal(
+    [
+      'GET',
+      'HEAD',
+      'POST',
+      'PUT',
+      'DELETE',
+      'CONNECT',
+      'OPTIONS',
+      'TRACE',
+      'PATCH',
+    ]
+    .includes(requestObject.method)
+  );
+
+  // `url` should be a URL that contains hostname & origin
+  const {url} = requestObject;
+  const urlProps = parseUrl(url);
+  assert.internal(urlProps.hostname);
+  assert.internal(url.startsWith('http'));
 }

@@ -129,8 +129,9 @@ function getRequestContext({req, addRequestContext}) {
   return requestContext;
 
   function getRequestUrl() {
-    const {url} = req;
-    assert.internal(url.constructor===String);
+    // https://stackoverflow.com/questions/10183291/how-to-get-the-full-url-in-express
+    const url = req.protocol + '://' + req.get('host') + req.originalUrl;
+    assert.internal(url.startsWith('http'));
     return url;
   }
 

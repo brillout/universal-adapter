@@ -163,8 +163,13 @@ function getRequestContext({request, addRequestContext}) {
   return requestContext;
 
   function getRequestUrl() {
-    const {url} = request.raw.req;
-    assert.internal(url.constructor===String);
+    // https://stackoverflow.com/questions/31840286/how-to-get-the-full-url-for-a-request-in-hapi
+    /* The accepected answer doesn't work:
+    const url = `${request.headers['x-forwarded-proto'] || request.connection.info.protocol}://${request.info.host}${request.url.path}`;
+    */
+    const HapiUrl = require('hapi-url');
+    const url = HapiUrl.current(request);
+    assert.internal(url.startsWith('http'));
     return url;
   }
 

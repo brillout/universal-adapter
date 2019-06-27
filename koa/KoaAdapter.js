@@ -87,8 +87,9 @@ function getRequestContext({ctx, addRequestContext}) {
   return requestContext;
 
   function getRequestUrl() {
-    const {url} = ctx;
-    assert.internal(url.constructor===String);
+    // https://github.com/koajs/koa/blob/master/docs/api/request.md#requesthref
+    const url = ctx.request.href;
+    assert.internal(url.startsWith('http'));
     return url;
   }
 

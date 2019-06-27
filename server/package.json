@@ -2,7 +2,7 @@
   "name": "@universal-adapter/server",
   "version": "0.2.1",
   "dependencies": {
-    "@brillout/parse-uri": "^0.1.1",
+    "@brillout/parse-url": "^0.2.1",
     "express": "^4.16.4",
     "hapi": "^17.8.1",
     "koa": "^2.6.2",
