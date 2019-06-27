@@ -1,9 +1,9 @@
 {
   "name": "@universal-adapter/koa",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "main": "KoaAdapter.js",
   "dependencies": {
-    "@universal-adapter/server": "0.2.1",
+    "@universal-adapter/server": "0.3.0",
     "koa-router": "^7.4.0",
     "reassert": "^1.1.16"
   },
