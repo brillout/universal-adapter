@@ -20,16 +20,15 @@ function getRequestHandlers(handlers) {
 
   handlerList.forEach(handler => {
     assert.usage(isCallable(handler));
-    // TODO - rename requestContext to requestObject
-    const requestHandler = function(requestObject) {
+    const requestHandler = function(requestProps) {
       assert.internal(arguments.length===1);
-      assert_requestObject(requestObject);
-      const urlProps = parseUrl(requestObject.url);
+      assert_requestProps(requestProps);
+      const urlProps = parseUrl(requestProps.url);
       return handler({
-        ...requestObject,
+        ...requestProps,
         ...urlProps,
         __sources: {
-          requestObject,
+          requestProps,
           urlProps,
         },
       });
@@ -118,12 +117,12 @@ function sortHandlers(handlers) {
   );
 }
 
-function assert_requestObject(requestObject) {
-  assert.internal('body' in requestObject);
+function assert_requestProps(requestProps) {
+  assert.internal('body' in requestProps);
 
   // `headers` should be an array,
   // but server frameworks seem to always return an object instead.
-  assert.internal(requestObject.headers.constructor===Object);
+  assert.internal(requestProps.headers.constructor===Object);
 
   assert.internal(
     [
@@ -137,11 +136,11 @@ function assert_requestObject(requestObject) {
       'TRACE',
       'PATCH',
     ]
-    .includes(requestObject.method)
+    .includes(requestProps.method)
   );
 
   // `url` should be a URL that contains hostname & origin
-  const {url} = requestObject;
+  const {url} = requestProps;
   const urlProps = parseUrl(url);
   assert.internal(urlProps.hostname);
   assert.internal(url.startsWith('http'));

@@ -94,7 +94,7 @@ async function buildResponse({requestHandlers, request, h, addRequestContext}) {
         continue;
       }
 
-      const {body, headers, redirect, statusCode, etag, type} = responseObject;
+      const {body, headers, redirect, statusCode, etag, contentType} = responseObject;
 
       const resp = h.response(body);
 
@@ -116,8 +116,8 @@ async function buildResponse({requestHandlers, request, h, addRequestContext}) {
         resp.code(statusCode);
       }
 
-      if( type ) {
-        resp.type(type);
+      if( contentType ) {
+        resp.type(contentType);
       }
 
       return resp;

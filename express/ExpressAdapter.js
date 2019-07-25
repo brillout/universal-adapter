@@ -1,11 +1,12 @@
 const assert = require('reassert');
 const getResponseObject = require('@universal-adapter/server/getResponseObject');
 const getRequestHandlers = require('@universal-adapter/server/getRequestHandlers');
+const textBody = require('body');
 
 module.exports = ExpressAdapter;
-// module.exports.buildResponse = buildResponse;
+module.exports.getRequestProps = getRequestProps;
 
-function ExpressAdapter(handlers, {addRequestContext}={}) {
+function ExpressAdapter(handlers) {
 
 //Object.assign(universalAdapter, {universalAdapter, addParams, serveContent, onServerClose});
 
@@ -42,24 +43,27 @@ function ExpressAdapter(handlers, {addRequestContext}={}) {
       if( alreadyServed(res) ) {
         return;
       }
-      await buildResponse({requestHandlers, req, res, addRequestContext});
+      await buildResponse({requestHandlers, req, res});
     } catch(err) {
       return err;
     }
   }
 }
 
-async function buildResponse({requestHandlers, req, res, addRequestContext}) {
+async function buildResponse({requestHandlers, req, res}) {
     assert.usage(requestHandlers);
     assert.usage(req);
     assert.usage(res);
 
-    const requestContext = getRequestContext({req, addRequestContext});
+    const requestObject = {
+      ...req,
+      ...(await getRequestProps(req)),
+    };
 
     for(const requestHandler of requestHandlers) {
       const responseObject = (
         getResponseObject(
-          await requestHandler(requestContext),
+          await requestHandler(requestObject),
           {extractEtagHeader: false}
         )
       );
@@ -68,7 +72,7 @@ async function buildResponse({requestHandlers, req, res, addRequestContext}) {
         continue;
       }
 
-      const {body, headers, redirect, statusCode/*, etag*/, type} = responseObject;
+      const {body, headers, redirect, statusCode/*, etag*/, contentType} = responseObject;
 
       assert.internal(!res.headersSent);
       headers.forEach(({name, value}) => res.set(name, value));
@@ -77,8 +81,8 @@ async function buildResponse({requestHandlers, req, res, addRequestContext}) {
         res.status(statusCode);
       }
 
-      if( type ) {
-        res.type(type);
+      if( contentType ) {
+        res.type(contentType);
       }
 
       if( redirect ) {
@@ -92,52 +96,36 @@ async function buildResponse({requestHandlers, req, res, addRequestContext}) {
     return false;
 }
 
-/*
-async function addParameters({paramHandlers, req}) {
-  assert.usage(paramHandlers);
-  assert.usage(req);
-
-  const requestContext = getRequestContext({req});
-
-  for(const paramHandler of paramHandlers) {
-    assert.usage(paramHandler instanceof Function);
-    const newParams = await paramHandler(requestContext);
-    assert.usage(newParams===null || newParams && newParams.constructor===Object);
-    Object.assign(req, newParams);
-  }
-}
-*/
-
-function getRequestContext({req, addRequestContext}) {
-  const url = getRequestUrl();
+async function getRequestProps(req) {
   const method = getRequestMethod();
   const headers = getRequestHeaders();
-  const body = getRequestBody();
+  const body = await getRequestBody();
+  if( method===undefined || headers===undefined || body===undefined ) return undefined;
+  const url = getRequestUrl();
+  if( url===undefined ) return undefined;
 
-  const requestContext = {
-    ...req,
+  const requestProps = {
     url,
     method,
     headers,
     body,
   };
-
-  if( addRequestContext ) {
-    Object.assign(requestContext, addRequestContext(req));
-  }
-
-  return requestContext;
+  return requestProps;
 
   function getRequestUrl() {
     // https://stackoverflow.com/questions/10183291/how-to-get-the-full-url-in-express
-    const url = req.protocol + '://' + req.get('host') + req.originalUrl;
-    assert.internal(url.startsWith('http'));
+    const {protocol, originalUrl} = req;
+    if( !protocol || !originalUrl ) return undefined;
+    assert.internal(protocol.startsWith('http'));
+    const host = req.get && req.get('host');
+    if( !host ) return undefined;
+    const url = protocol + '://' + host + originalUrl;
     return url;
   }
 
   function getRequestMethod() {
     const {method} = req;
-    assert.internal(url.constructor===String);
+    assert.internal(method.constructor===String);
     return method;
   }
 
@@ -147,8 +135,38 @@ function getRequestContext({req, addRequestContext}) {
     return headers;
   }
 
-  function getRequestBody() {
-    return req.body;
+  async function getRequestBody() {
+    console.log('b1');
+    console.log(req.body);
+    console.log('b2');
+    /*
+ // return req.body || null;
+    let resolve;
+    const promise = new Promise(r => resolve = r);
+    let text = '';
+    req.on('data', function(chunk){ text += chunk });
+    req.on('end', resolve);
+    await promise;
+    return text;
+    /*/
+ // return req.body || null;
+    let resolve;
+    let reject;
+    const promise = new Promise((_resolve, _reject) => {resolve = _resolve;_reject = reject;});
+    console.log(111);
+    textBody(
+      req,
+      (err, body) => {
+    console.log(122, err, body==='', body, 13);
+        if( err ){
+          reject(err);
+        } else {
+          resolve(body);
+        }
+      }
+    );
+    return promise;
+    //*/
   }
 }
 

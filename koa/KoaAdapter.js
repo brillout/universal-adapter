@@ -5,9 +5,11 @@ const assert = require('reassert');
 
 
 module.exports = KoaAdapter;
-// module.exports.buildResponse = buildResponse;
+module.exports.getRequestProps = getRequestProps;
 
-function KoaAdapter(handlers, {addRequestContext}={}) { const router = new Router();
+function KoaAdapter(handlers, {addRequestContext}={}) {
+  const router = new Router();
+
   router.all('*', async (ctx, next) => {
     const requestHandlers = getRequestHandlers(handlers);
     await buildResponse({requestHandlers, ctx, addRequestContext});
@@ -20,12 +22,12 @@ function KoaAdapter(handlers, {addRequestContext}={}) { const router = new Route
 }
 
 async function buildResponse({requestHandlers, ctx, addRequestContext}) {
-  const requestContext = getRequestContext({ctx, addRequestContext});
+  const requestProps = await getRequestProps({ctx, addRequestContext});
 
   for(const requestHandler of requestHandlers) {
     const responseObject = (
       getResponseObject(
-        await requestHandler(requestContext),
+        await requestHandler(requestProps),
         {extractEtagHeader: true}
       )
     );
@@ -34,7 +36,7 @@ async function buildResponse({requestHandlers, ctx, addRequestContext}) {
       continue;
     }
 
-    const {body, headers, redirect, statusCode, etag, type} = responseObject;
+    const {body, headers, redirect, statusCode, etag, contentType} = responseObject;
 
     headers.forEach(header => ctx.set(header.name, header.value));
 
@@ -51,8 +53,8 @@ async function buildResponse({requestHandlers, ctx, addRequestContext}) {
       ctx.status = statusCode;
     }
 
-    if( type ) {
-      ctx.type = type;
+    if( contentType ) {
+      ctx.type = contentType;
     }
 
     ctx.body = body;
@@ -66,13 +68,13 @@ async function buildResponse({requestHandlers, ctx, addRequestContext}) {
   return false;
 }
 
-function getRequestContext({ctx, addRequestContext}) {
+async function getRequestProps({ctx, addRequestContext}) {
   const url = getRequestUrl();
   const method = getRequestMethod();
   const headers = getRequestHeaders();
-  const body = getRequestBody();
+  const body = await getRequestBody();
 
-  const requestContext = {
+  const requestProps = {
     ...ctx,
     url,
     method,
@@ -81,10 +83,10 @@ function getRequestContext({ctx, addRequestContext}) {
   };
 
   if( addRequestContext ) {
-    Object.assign(requestContext, addRequestContext(ctx));
+    Object.assign(requestProps, addRequestContext(ctx));
   }
 
-  return requestContext;
+  return requestProps;
 
   function getRequestUrl() {
     // https://github.com/koajs/koa/blob/master/docs/api/request.md#requesthref
@@ -105,8 +107,22 @@ function getRequestContext({ctx, addRequestContext}) {
     return headers;
   }
 
-  function getRequestBody() {
-    return ctx.body;
+  async function getRequestBody() {
+    let {body} = ctx.request;
+ // console.log('bb', body);
+    if (Buffer.isBuffer(body)) body = body.toString();
+    return body || null;
+/*
+app.use(function(req, res, next){
+  if (req.is('text/*')) {
+    req.text = '';
+    req.setEncoding('utf8');
+    req.on('data', function(chunk){ req.text += chunk });
+    req.on('end', next);
+  } else {
+    next();
+  }
+});
+*/
   }
 }
-
