@@ -33,6 +33,8 @@ function getRequestHandlers(handlers) {
         },
       });
     };
+    requestHandler.name = handler.name;
+    requestHandler.executionPriority = handler.executionPriority;
     requestHandlers.push(requestHandler);
   });
 
@@ -46,18 +48,16 @@ function isCallable(thing) {
 }
 
 function sortHandlers(handlers) {
-  return (
-    handlers
-    .sort((h1, h2) => {
-      assert.internal(isCallable(h1));
-      assert.internal(isCallable(h2));
-      const p1 = (h1.executionPriority||0);
-      const p2 = (h2.executionPriority||0);
-      assert.internal(p1.constructor===Number);
-      assert.internal(p2.constructor===Number);
-      return p2 - p1;
-    })
-  );
+  handlers
+  .sort((h1, h2) => {
+    assert.internal(isCallable(h1));
+    assert.internal(isCallable(h2));
+    const p1 = (h1.executionPriority||0);
+    const p2 = (h2.executionPriority||0);
+    assert.internal(p1.constructor===Number);
+    assert.internal(p2.constructor===Number);
+    return p2 - p1;
+  });
 }
 
 function assert_requestProps(requestProps) {
