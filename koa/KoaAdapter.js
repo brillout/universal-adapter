@@ -5,7 +5,6 @@ const assert = require('reassert');
 
 
 module.exports = KoaAdapter;
-module.exports.getRequestProps = getRequestProps;
 
 function KoaAdapter(handlers, {addRequestContext}={}) {
   const router = new Router();

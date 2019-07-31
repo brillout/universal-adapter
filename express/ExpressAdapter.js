@@ -4,7 +4,6 @@ const getRequestHandlers = require('@universal-adapter/server/getRequestHandlers
 const textBody = require('body');
 
 module.exports = ExpressAdapter;
-module.exports.getRequestProps = getRequestProps;
 
 function ExpressAdapter(handlers) {
 
@@ -100,11 +99,10 @@ async function getRequestProps(req) {
   const method = getRequestMethod();
   const headers = getRequestHeaders();
   const body = await getRequestBody();
-  if( method===undefined || headers===undefined || body===undefined ) return undefined;
   const url = getRequestUrl();
-  if( url===undefined ) return undefined;
 
   const requestProps = {
+    ...req,
     url,
     method,
     headers,
@@ -115,10 +113,9 @@ async function getRequestProps(req) {
   function getRequestUrl() {
     // https://stackoverflow.com/questions/10183291/how-to-get-the-full-url-in-express
     const {protocol, originalUrl} = req;
-    if( !protocol || !originalUrl ) return undefined;
     assert.internal(protocol.startsWith('http'));
     const host = req.get && req.get('host');
-    if( !host ) return undefined;
+    assert.internal(host);
     const url = protocol + '://' + host + originalUrl;
     return url;
   }
