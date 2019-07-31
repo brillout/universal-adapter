@@ -1,10 +1,10 @@
 {
   "name": "@universal-adapter/hapi",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "main": "HapiAdapter.js",
   "dependencies": {
     "@brillout/reassert": "^0.1.1",
-    "@universal-adapter/server": "0.3.0",
+    "@universal-adapter/server": "0.4.0",
     "boom": "^7.2.0",
     "hapi-url": "^1.0.2"
   },
