@@ -11,7 +11,13 @@
   },
   "devDependencies": {
     "@brillout/cli-theme": "^0.3.2",
+    "@brillout/fetch": "^0.1.2",
     "@brillout/mdocs": "^0.1.25",
+    "@brillout/reassert": "^0.1.1",
+    "express": "^4.17.1",
+    "glob": "^7.1.4",
+    "hapi": "^18.1.0",
+    "koa": "^2.7.0",
     "lerna": "^2.11.0",
     "yarn": "^1.6.0"
   },

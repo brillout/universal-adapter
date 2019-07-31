@@ -14,8 +14,6 @@ async function runTests() {
       serverLibraryName: 'Express',
       runner: runWithExpress,
     },
-    /*
-    */
     {
       serverLibraryName: 'Koa',
       runner: runWithKoa,
@@ -60,45 +58,6 @@ async function runWithHapi({test, handler}) {
   }
 }
 
-async function runWithExpress({test, handler}) {
-  const express = require('express');
-  const ExpressAdapter = require('../express');
-
-  const app = express();
-
-  app.use(
-    new ExpressAdapter([
-      handler,
-    ])
-  );
-
-  const server = await startServer(app);
-
-  try {
-    await test({fetch});
-  } finally {
-    await stopServer(server);
-  }
-
-  return;
-
-}
-
-  /*
-async function runWithKoa({test, handler}) {
-  const Koa = require('koa');
-  const app = new Koa();
-
-  app.use(async ctx => {
-    ctx.body = 'Hello World';
-  });
-
-  app.listen(3000);
-
-  return;
-
-}
-  */
 async function runWithKoa({test, handler}){
   const Koa = require('koa');
   const KoaAdapter = require('../koa');
@@ -118,12 +77,28 @@ async function runWithKoa({test, handler}){
   } finally {
     await server.close();
   }
-
-//await sleep();
-
-  return;
 }
 
+async function runWithExpress({test, handler}) {
+  const express = require('express');
+  const ExpressAdapter = require('../express');
+
+  const app = express();
+
+  app.use(
+    new ExpressAdapter([
+      handler,
+    ])
+  );
+
+  const server = await startServer(app);
+
+  try {
+    await test({fetch});
+  } finally {
+    await stopServer(server);
+  }
+}
 async function startServer(app) {
   const http = require('http');
   const server = http.createServer(app);
@@ -154,7 +129,6 @@ async function fetch(url, fetchArgs) {
   const resp = await fetch('http://localhost:3000'+url, fetchArgs);
 
   const body = await resp.text();
-
   return body;
 }
 
@@ -175,12 +149,4 @@ function getTests() {
   });
 
   return tests;
-}
-
-
-function sleep() {
-  let r;
-  const p = new Promise(_ => r=_);
-  setTimeout(r, 1000);
-  return p;
 }
