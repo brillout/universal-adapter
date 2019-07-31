@@ -12,8 +12,6 @@
   "devDependencies": {
     "@brillout/cli-theme": "^0.3.2",
     "@brillout/mdocs": "^0.1.25",
-    "koa-body-parser": "^1.1.2",
-    "koa-bodyparser": "^4.2.1",
     "lerna": "^2.11.0",
     "yarn": "^1.6.0"
   },

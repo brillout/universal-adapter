@@ -118,8 +118,6 @@ function sortHandlers(handlers) {
 }
 
 function assert_requestProps(requestProps) {
-  assert.internal('body' in requestProps);
-
   // `headers` should be an array,
   // but server frameworks seem to always return an object instead.
   assert.internal(requestProps.headers.constructor===Object);

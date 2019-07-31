@@ -1,7 +1,6 @@
 const assert = require('reassert');
 const getResponseObject = require('@universal-adapter/server/getResponseObject');
 const getRequestHandlers = require('@universal-adapter/server/getRequestHandlers');
-const textBody = require('body');
 
 module.exports = ExpressAdapter;
 
@@ -56,7 +55,7 @@ async function buildResponse({requestHandlers, req, res}) {
 
     const requestObject = {
       ...req,
-      ...(await getRequestProps(req)),
+      ...getRequestProps(req),
     };
 
     for(const requestHandler of requestHandlers) {
@@ -95,10 +94,9 @@ async function buildResponse({requestHandlers, req, res}) {
     return false;
 }
 
-async function getRequestProps(req) {
+function getRequestProps(req) {
   const method = getRequestMethod();
   const headers = getRequestHeaders();
-  const body = await getRequestBody();
   const url = getRequestUrl();
 
   const requestProps = {
@@ -106,7 +104,6 @@ async function getRequestProps(req) {
     url,
     method,
     headers,
-    body,
   };
   return requestProps;
 
@@ -130,40 +127,6 @@ async function getRequestProps(req) {
     const {headers} = req;
     assert.internal(headers.constructor===Object);
     return headers;
-  }
-
-  async function getRequestBody() {
-    console.log('b1');
-    console.log(req.body);
-    console.log('b2');
-    /*
- // return req.body || null;
-    let resolve;
-    const promise = new Promise(r => resolve = r);
-    let text = '';
-    req.on('data', function(chunk){ text += chunk });
-    req.on('end', resolve);
-    await promise;
-    return text;
-    /*/
- // return req.body || null;
-    let resolve;
-    let reject;
-    const promise = new Promise((_resolve, _reject) => {resolve = _resolve;_reject = reject;});
-    console.log(111);
-    textBody(
-      req,
-      (err, body) => {
-    console.log(122, err, body==='', body, 13);
-        if( err ){
-          reject(err);
-        } else {
-          resolve(body);
-        }
-      }
-    );
-    return promise;
-    //*/
   }
 }
 

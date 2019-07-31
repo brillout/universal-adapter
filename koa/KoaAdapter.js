@@ -71,14 +71,12 @@ async function getRequestProps({ctx, addRequestContext}) {
   const url = getRequestUrl();
   const method = getRequestMethod();
   const headers = getRequestHeaders();
-  const body = await getRequestBody();
 
   const requestProps = {
     ...ctx,
     url,
     method,
     headers,
-    body,
   };
 
   if( addRequestContext ) {
@@ -104,24 +102,5 @@ async function getRequestProps({ctx, addRequestContext}) {
     const {headers} = ctx;
     assert.internal(headers.constructor===Object);
     return headers;
-  }
-
-  async function getRequestBody() {
-    let {body} = ctx.request;
- // console.log('bb', body);
-    if (Buffer.isBuffer(body)) body = body.toString();
-    return body || null;
-/*
-app.use(function(req, res, next){
-  if (req.is('text/*')) {
-    req.text = '';
-    req.setEncoding('utf8');
-    req.on('data', function(chunk){ req.text += chunk });
-    req.on('end', next);
-  } else {
-    next();
-  }
-});
-*/
   }
 }

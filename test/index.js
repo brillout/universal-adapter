@@ -62,14 +62,9 @@ async function runWithHapi({test, handler}) {
 
 async function runWithExpress({test, handler}) {
   const express = require('express');
-  var bodyParser = require('body-parser')
   const ExpressAdapter = require('../express');
 
   const app = express();
-
-//*
-  app.use(bodyParser.text());
-//*/
 
   app.use(
     new ExpressAdapter([
@@ -106,12 +101,9 @@ async function runWithKoa({test, handler}) {
   */
 async function runWithKoa({test, handler}){
   const Koa = require('koa');
-  const bodyParser = require('koa-bodyparser');
   const KoaAdapter = require('../koa');
 
   const app = new Koa();
-
-  app.use(bodyParser({enableTypes: ['text']}));
 
   const server = app.listen(3000);
 

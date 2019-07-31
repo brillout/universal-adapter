@@ -18,6 +18,7 @@ function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
           handler: catchAllRoute,
         });
       } else {
+        // The payload (aka POST request body) doesn't seem to be available at `onPreResponse`.
         server.ext('onPreResponse', onPreResponse);
       }
 
@@ -62,9 +63,6 @@ function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
     if( isAlreadyServed(request) ) {
         return h.continue;
     }
-
-    // The payload (aka POST request body) doesn't seem to be available at `onPreResponse`.
-    // console.log('where is my payload?', request.payload, request.body);
 
     const requestHandlers = getRequestHandlers(handlers);
     const resp = await buildResponse({requestHandlers, request, h, addRequestContext});
@@ -146,14 +144,12 @@ function getRequestContext({request, addRequestContext}) {
   const url = getRequestUrl();
   const method = getRequestMethod();
   const headers = getRequestHeaders();
-  const body = getRequestBody();
 
   const requestContext = {
     ...request,
     url,
     method,
     headers,
-    body,
   };
 
   if( addRequestContext ) {
@@ -184,25 +180,6 @@ function getRequestContext({request, addRequestContext}) {
     assert.internal(headers.constructor===Object);
     return headers;
   }
-
-  function getRequestBody() {
-    // Sometimes `Object.getPrototypeOf(payload)===null` which leads to `payload.constructor===undefined`
-    // We normalize that case by doing `{...payload}`
-    let {payload} = request;
-    payload = (
-      (!payload || [String, Object].includes(payload.constructor)) ? (
-        payload
-      ) : (
-        {...payload}
-      )
-    );
-    assert.internal(!payload || [String, Object].includes(payload.constructor));
-
-    // The proper name is "body" not "payload"
-    const body = payload;
-
-    return body;
-  }
 }
 
 function isAlreadyServed(request) {
@@ -222,49 +199,3 @@ function isAlreadyServed(request) {
 
     return false;
 }
-
-/*
-const formBody = require("body/form")
-const qs = require('querystring');
-
-function getBodyPayload(req, url) {
-    if( req.method==='GET' ) {
-        return Object.assign({}, qs.parse(url.search.slice(1)));
-    }
-    let resolve;
-    let reject;
-    const promise = new Promise((resolve_, reject_) => {resolve = resolve_; reject = reject_;});
-
-    console.log(111);
-	let body = '';
-	req.on('data', function (data) {
-    console.log(222);
-		body += data;
-		if (body.length > 1e6)
-			req.connection.destroy();
-	});
-	req.on('end', function () {
-    console.log(333);
-		var post = qs.parse(body);
-        resolve(post);
-	});
-
-	return promise;
-}
-
-function getBodyPayload(req) {
-    let resolve;
-    let reject;
-    const promise = new Promise((resolve_, reject_) => {resolve = resolve_; reject = reject_;});
-    console.log(11111);
-    formBody(req, {}, (err, body) => {
-    console.log(22222);
-        if( err ) {
-            reject(err);
-        } else {
-            resolve(body);
-        }
-    });
-    return promise;
-}
-*/
