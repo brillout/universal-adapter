@@ -1,5 +1,5 @@
 const assert = require('@brillout/reassert');
-const parseUrl = require('@brillout/parse-url');
+const getUrlProps = require('@brillout/url-props');
 
 module.exports = getRequestHandlers;
 
@@ -23,7 +23,7 @@ function getRequestHandlers(handlers) {
     const requestHandler = function(requestProps) {
       assert.internal(arguments.length===1);
       assert_requestProps(requestProps);
-      const urlProps = parseUrl(requestProps.url);
+      const urlProps = getUrlProps(requestProps.url);
       return handler({
         ...requestProps,
         ...urlProps,
@@ -39,63 +39,6 @@ function getRequestHandlers(handlers) {
   sortHandlers(requestHandlers);
 
   return requestHandlers;
-
-  /*
-  const requestHandlers = [];
-  const paramHandlers = [];
-  const onServerCloseHandlers = [];
-
-  handlerList
-  .forEach(handlerSpec => {
-    if( isCallable(handlerSpec) ) {
-      requestHandlers.push(handlerSpec);
-      return;
-    }
-    assert.usage(
-      handlerSpec && handlerSpec.constructor===Object,
-      handlerSpec,
-      "Provided universal plug is not an object nor a function"
-    );
-
-    const handlerNames = ['paramHandler', 'requestHandler', 'onServerCloseHandler'];
-
-    assert.usage(Object.keys(handlerSpec).filter(key => !handlerNames.includes(key)).length===0, handlerSpec);
-    assert.usage(Object.keys(handlerSpec).length>0, handlerSpec);
-
-    handlerNames.forEach(handlerName => {
-      const handler = handlerSpec[handlerName];
-      if( ! handler ) {
-        return;
-      }
-      assert.usage(isCallable(handler), handlerSpec, handler, handlerName);
-      if( handlerName==='paramHandler' ) {
-        assert_notImplemented(false);
-        paramHandlers.push(handler);
-        return;
-      }
-      if( handlerName==='requestHandler' ) {
-        requestHandlers.push(handler);
-        return;
-      }
-      if( handlerName==='onServerCloseHandler' ) {
-        assert_notImplemented(false);
-        onServerCloseHandlers.push(handler);
-        return;
-      }
-      assert.internal(false);
-    });
-  });
-
-  sortHandlers(requestHandlers);
-  sortHandlers(paramHandlers);
-  sortHandlers(onServerCloseHandlers);
-
-  return {requestHandlers, paramHandlers, onServerCloseHandlers};
-
-  function assert_notImplemented(val) {
-    assert.internal(val, 'NOT-IMPLEMENTED');
-  }
-  */
 }
 
 function isCallable(thing) {
@@ -139,7 +82,7 @@ function assert_requestProps(requestProps) {
 
   // `url` should be a URL that contains hostname & origin
   const {url} = requestProps;
-  const urlProps = parseUrl(url);
+  const urlProps = getUrlProps(url);
   assert.internal(urlProps.hostname);
   assert.internal(url.startsWith('http'));
 }

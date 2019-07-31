@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "dependencies": {
     "@brillout/reassert": "^0.1.1",
-    "@brillout/parse-url": "^0.2.1"
+    "@brillout/url-props": "^0.1.1"
   },
   "description": "Universal Server Adapter Interface",
   "repository": "github:brillout/universal-adapter",

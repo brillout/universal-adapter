@@ -58,13 +58,6 @@
     find-up "^2.1.0"
     lodash.escaperegexp "^4.1.2"
 
-"@brillout/parse-url@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.npmjs.org/@brillout/parse-url/-/parse-url-0.2.1.tgz#e3ddd8c47ac583e5bf284503b71c633f5f043749"
-  integrity sha512-C0FmqahuI24dPYuGGTblhjFK+kvmXVq7OFbLQwjcrMN2yRVHgMOuzg/wtpwwKDk/7jITR7nAIGvSfiUsrA2LKw==
-  dependencies:
-    "@brillout/reassert" "^0.1.1"
-
 "@brillout/reassert@0.0.2":
   version "0.0.2"
   resolved "https://registry.npmjs.org/@brillout/reassert/-/reassert-0.0.2.tgz#0a010a6be8ec1bd71fa9c77f15d877fa5c54505a"
@@ -83,6 +76,13 @@
   version "0.1.0"
   resolved "https://registry.npmjs.org/@brillout/relative-to-homedir/-/relative-to-homedir-0.1.0.tgz#57e1d64423688787d29f3066ba374175574c1048"
   integrity sha512-aN5b6YSKlpH3Age7ELDrCp5L/VxWN16dAQ+PliT+mRaLcSMxh8l9lrdMsThrdFn8TQbB6k/LSo+FdmQBlaavnA==
+
+"@brillout/url-props@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.npmjs.org/@brillout/url-props/-/url-props-0.1.1.tgz#7196ed5d39653e03948d171ce246d1d8a4f9b052"
+  integrity sha512-/913Ac2YPTgERToR/D56tx35YRcDLUgyJBp4VHoMtjN3Kk5gDh8m4y1mEDd6i2LGWabfLjYHe5WKUBwikfSDQw==
+  dependencies:
+    "@brillout/reassert" "^0.1.1"
 
 "@improved/node@^1.0.0":
   version "1.0.0"
