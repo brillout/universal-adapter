@@ -1,3 +1,4 @@
+const assert = require('@brillout/reassert');
 const {symbolSuccess, symbolError} = require('@brillout/cli-theme');
 
 runTests();
@@ -20,11 +21,13 @@ async function runTests() {
     },
   ];
 
-  for(let {test, handler, testPath} of tests) {
+  for(let {test, handler, handlers, testPath} of tests) {
+    assert.internal(!handler || !handlers);
+    handlers = handlers || [handler];
     for(let {serverLibraryName, runner} of serverRunners) {
       let err = false;
       try {
-        await runner({test, handler});
+        await runner({test, handlers});
       } catch(_err) {
         err = _err;
       }
@@ -34,7 +37,7 @@ async function runTests() {
   }
 }
 
-async function runWithHapi({test, handler}) {
+async function runWithHapi({test, handlers}) {
   const Hapi = require('hapi');
   const HapiAdapter = require('../hapi');
 
@@ -44,9 +47,7 @@ async function runWithHapi({test, handler}) {
   });
 
   await server.register(
-    new HapiAdapter([
-      handler,
-    ])
+    new HapiAdapter(handlers)
   );
 
   await server.start();
@@ -58,7 +59,7 @@ async function runWithHapi({test, handler}) {
   }
 }
 
-async function runWithKoa({test, handler}){
+async function runWithKoa({test, handlers}){
   const Koa = require('koa');
   const KoaAdapter = require('../koa');
 
@@ -67,9 +68,7 @@ async function runWithKoa({test, handler}){
   const server = app.listen(3000);
 
   app.use(
-    new KoaAdapter([
-      handler,
-    ])
+    new KoaAdapter(handlers)
   );
 
   try {
@@ -79,16 +78,14 @@ async function runWithKoa({test, handler}){
   }
 }
 
-async function runWithExpress({test, handler}) {
+async function runWithExpress({test, handlers}) {
   const express = require('express');
   const ExpressAdapter = require('../express');
 
   const app = express();
 
   app.use(
-    new ExpressAdapter([
-      handler,
-    ])
+    new ExpressAdapter(handlers)
   );
 
   const server = await startServer(app);
@@ -142,9 +139,9 @@ function getTests() {
   const tests = [];
   testFiles.forEach(filePath => {
     const fileTests = require(filePath);
-    fileTests.forEach(({test, handler}) => {
+    fileTests.forEach(testArgs => {
       const testPath = path.relative(projectRoot, filePath);
-      tests.push({test, handler, testPath})
+      tests.push({...testArgs, testPath})
     });
   });
 
