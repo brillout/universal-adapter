@@ -1,12 +1,15 @@
-const Boom = require('boom');
-const assert = require('reassert');
+const assert = require('@brillout/reassert');
+
 const getResponseObject = require('@universal-adapter/server/getResponseObject');
 const getRequestHandlers = require('@universal-adapter/server/getRequestHandlers');
+
+const Boom = require('boom');
+const HapiUrl = require('hapi-url');
 
 module.exports = HapiAdapter;
 // module.exports.buildResponse = buildResponse;
 
-function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
+function HapiAdapter(handlers, {useOnPreResponse=false}={}) {
   const HapiPlugin = {
     name: 'HapiAdapter',
     multiple: false,
@@ -21,23 +24,6 @@ function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
         // The payload (aka POST request body) doesn't seem to be available at `onPreResponse`.
         server.ext('onPreResponse', onPreResponse);
       }
-
-      /*
-      server.ext('onRequest', async (request, h) => {
-        const {paramHandlers} = getRequestHandlers(handlers);
-        await addParameters({paramHandlers, request, addRequestContext});
-        return h.continue;
-      });
-      */
-
-      /* It could be better to not support this feature
-      server.ext('onPostStop', async () => {
-        const {onServerCloseHandlers} = getRequestHandlers(handlers);
-        for(const cb of onServerCloseHandlers) {
-          await cb();
-        }
-      });
-      */
     },
   };
 
@@ -51,7 +37,7 @@ function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
     }
 
     const requestHandlers = getRequestHandlers(handlers);
-    const resp = await buildResponse({requestHandlers, request, h, addRequestContext});
+    const resp = await buildResponse({requestHandlers, request, h});
     if( resp === null ) {
       throw Boom.notFound(null, {});
     }
@@ -65,7 +51,7 @@ function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
     }
 
     const requestHandlers = getRequestHandlers(handlers);
-    const resp = await buildResponse({requestHandlers, request, h, addRequestContext});
+    const resp = await buildResponse({requestHandlers, request, h});
     if( resp === null ) {
       return h.continue;
     }
@@ -73,17 +59,20 @@ function HapiAdapter(handlers, {useOnPreResponse=false, addRequestContext}={}) {
   }
 }
 
-async function buildResponse({requestHandlers, request, h, addRequestContext}) {
+async function buildResponse({requestHandlers, request, h}) {
     assert.usage(requestHandlers);
     assert.usage(request && request.raw && request.raw.req);
     assert.usage(h && h.continue);
 
-    const requestContext = getRequestContext({request, addRequestContext});
+    const requestObject = {
+      ...request,
+      ...getRequestProps(request),
+    };
 
     for(const requestHandler of requestHandlers) {
       const responseObject = (
         getResponseObject(
-          await requestHandler(requestContext),
+          await requestHandler(requestObject),
           {extractEtagHeader: true}
         )
       );
@@ -124,46 +113,23 @@ async function buildResponse({requestHandlers, request, h, addRequestContext}) {
     return null;
 }
 
-/*
-async function addParameters({paramHandlers, request, addRequestContext}) {
-  assert.usage(paramHandlers);
-  assert.usage(request && request.raw && request.raw.req);
-
-  const requestContext = getRequestContext({request, addRequestContext});
-
-  for(const paramHandler of paramHandlers) {
-    assert.usage(paramHandler instanceof Function);
-    const newParams = await paramHandler(requestContext);
-    assert.usage(newParams===null || newParams && newParams.constructor===Object);
-    Object.assign(request, newParams);
-  }
-}
-*/
-
-function getRequestContext({request, addRequestContext}) {
+function getRequestProps(request) {
   const url = getRequestUrl();
   const method = getRequestMethod();
   const headers = getRequestHeaders();
 
-  const requestContext = {
-    ...request,
+  const requestProps = {
     url,
     method,
     headers,
   };
-
-  if( addRequestContext ) {
-    Object.assign(requestContext, addRequestContext(request));
-  }
-
-  return requestContext;
+  return requestProps;
 
   function getRequestUrl() {
     // https://stackoverflow.com/questions/31840286/how-to-get-the-full-url-for-a-request-in-hapi
     /* The accepected answer doesn't work:
     const url = `${request.headers['x-forwarded-proto'] || request.connection.info.protocol}://${request.info.host}${request.url.path}`;
     */
-    const HapiUrl = require('hapi-url');
     const url = HapiUrl.current(request);
     assert.internal(url.startsWith('http'));
     return url;

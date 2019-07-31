@@ -1,4 +1,5 @@
-const assert = require('reassert');
+const assert = require('@brillout/reassert');
+
 const getResponseObject = require('@universal-adapter/server/getResponseObject');
 const getRequestHandlers = require('@universal-adapter/server/getRequestHandlers');
 
@@ -6,34 +7,12 @@ module.exports = ExpressAdapter;
 
 function ExpressAdapter(handlers) {
 
-//Object.assign(universalAdapter, {universalAdapter, addParams, serveContent, onServerClose});
-
   return universalAdapter;
 
   async function universalAdapter(req, res, next) {
-//  await addParameters({paramHandlers, req});
-
     const err = await handleResponse(req, res);
     next(err);
   }
-
-  /*
-  async function addParams(req, res, next) {
-    await addParameters({paramHandlers, req});
-    next();
-  }
-
-  async function serveContent(req, res, next) {
-    const err = await handleResponse(req, res);
-    next(err);
-  }
-
-  async function onServerClose () {
-    for(const cb of onServerCloseHandlers) {
-      await cb();
-    }
-  }
-  */
 
   async function handleResponse(req, res) {
     const requestHandlers = getRequestHandlers(handlers);
@@ -95,12 +74,11 @@ async function buildResponse({requestHandlers, req, res}) {
 }
 
 function getRequestProps(req) {
+  const url = getRequestUrl();
   const method = getRequestMethod();
   const headers = getRequestHeaders();
-  const url = getRequestUrl();
 
   const requestProps = {
-    ...req,
     url,
     method,
     headers,

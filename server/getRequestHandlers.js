@@ -1,4 +1,4 @@
-const assert = require('reassert');
+const assert = require('@brillout/reassert');
 const parseUrl = require('@brillout/parse-url');
 
 module.exports = getRequestHandlers;

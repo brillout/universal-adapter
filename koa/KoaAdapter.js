@@ -1,17 +1,18 @@
-const Router = require('koa-router');
+const assert = require('@brillout/reassert');
+
 const getResponseObject = require('@universal-adapter/server/getResponseObject');
 const getRequestHandlers = require('@universal-adapter/server/getRequestHandlers');
-const assert = require('reassert');
 
+const Router = require('koa-router');
 
 module.exports = KoaAdapter;
 
-function KoaAdapter(handlers, {addRequestContext}={}) {
+function KoaAdapter(handlers) {
   const router = new Router();
 
   router.all('*', async (ctx, next) => {
     const requestHandlers = getRequestHandlers(handlers);
-    await buildResponse({requestHandlers, ctx, addRequestContext});
+    await buildResponse({requestHandlers, ctx});
     // More infos about `next()`:
     //  - https://github.com/koajs/koa/blob/master/docs/guide.md#response-middleware
     await next();
@@ -20,13 +21,16 @@ function KoaAdapter(handlers, {addRequestContext}={}) {
   return router.routes();
 }
 
-async function buildResponse({requestHandlers, ctx, addRequestContext}) {
-  const requestProps = await getRequestProps({ctx, addRequestContext});
+async function buildResponse({requestHandlers, ctx}) {
+  const requestObject = {
+    ...ctx,
+    ...getRequestProps(ctx),
+  };
 
   for(const requestHandler of requestHandlers) {
     const responseObject = (
       getResponseObject(
-        await requestHandler(requestProps),
+        await requestHandler(requestObject),
         {extractEtagHeader: true}
       )
     );
@@ -67,22 +71,16 @@ async function buildResponse({requestHandlers, ctx, addRequestContext}) {
   return false;
 }
 
-async function getRequestProps({ctx, addRequestContext}) {
+function getRequestProps(ctx) {
   const url = getRequestUrl();
   const method = getRequestMethod();
   const headers = getRequestHeaders();
 
   const requestProps = {
-    ...ctx,
     url,
     method,
     headers,
   };
-
-  if( addRequestContext ) {
-    Object.assign(requestProps, addRequestContext(ctx));
-  }
-
   return requestProps;
 
   function getRequestUrl() {

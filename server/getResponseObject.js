@@ -1,4 +1,4 @@
-const assert = require('reassert');
+const assert = require('@brillout/reassert');
 
 module.exports = getResponseObject;
 

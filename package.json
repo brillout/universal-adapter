@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "clean": "git clean -Xdf",
+    "deps": "check-deps",
     "docs": "mdocs ./docs/",
     "release-dry-run": "lerna publish --force-publish=* --skip-git --skip-npm",
     "release-retry": "lerna publish --force-publish=* --skip-git",
@@ -10,6 +11,7 @@
     "i": "yarn"
   },
   "devDependencies": {
+    "@brillout/check-deps": "^0.1.5",
     "@brillout/cli-theme": "^0.3.2",
     "@brillout/fetch": "^0.1.2",
     "@brillout/mdocs": "^0.1.25",

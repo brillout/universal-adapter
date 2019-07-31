@@ -1,11 +1,13 @@
 {
   "private": true,
-  "name": "_universal-adapter_example",
+  "name": "example",
   "version": "0.3.0",
   "dependencies": {
+    "@universal-adapter/express": "0.3.0",
+    "@universal-adapter/hapi": "0.3.0",
+    "@universal-adapter/koa": "0.3.0",
     "express": "^4.16.4",
     "hapi": "^17.8.1",
-    "koa": "^2.6.2",
-    "koa-router": "^7.4.0"
+    "koa": "^2.6.2"
   }
 }
