@@ -26,7 +26,6 @@
     "hapi",
     "koa",
     "server",
-    "example",
-    "typeorm"
+    "example"
   ]
 }
