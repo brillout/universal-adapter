@@ -10,20 +10,28 @@ function ExpressAdapter(handlers) {
   return universalAdapter;
 
   async function universalAdapter(req, res, next) {
-    const err = await handleResponse(req, res);
-    next(err);
+    const responseBuilt = await handleResponse(req, res);
+    assert.internal([true, false].includes(responseBuilt) || responseBuilt.err);
+    if( responseBuilt===false ) {
+      next();
+      return;
+    }
+    if( responseBuilt===true ) {
+      return;
+    }
+    if( responseBuilt.err ) {
+      next(err);
+      return;
+    }
+    assert.internal(false);
   }
 
   async function handleResponse(req, res) {
     const requestHandlers = getRequestHandlers(handlers);
-    try {
-      if( alreadyServed(res) ) {
-        return;
-      }
-      await buildResponse({requestHandlers, req, res});
-    } catch(err) {
-      return err;
+    if( alreadyServed(res) ) {
+      return false;
     }
+    return await buildResponse({requestHandlers, req, res});
   }
 }
 
@@ -38,12 +46,13 @@ async function buildResponse({requestHandlers, req, res}) {
     };
 
     for(const requestHandler of requestHandlers) {
-      const responseObject = (
-        getResponseObject(
-          await requestHandler(requestObject),
-          {extractEtagHeader: false}
-        )
-      );
+      let handlerResult;
+      try {
+        handlerResult = await requestHandler(requestObject);
+      } catch(err) {
+        return {err};
+      }
+      const responseObject = getResponseObject(handlerResult, {extractEtagHeader: false});
 
       if( responseObject === null ) {
         continue;
