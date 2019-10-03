@@ -12,10 +12,19 @@ function KoaAdapter(handlers) {
 
   router.all('*', async (ctx, next) => {
     const requestHandlers = getRequestHandlers(handlers);
-    await buildResponse({requestHandlers, ctx});
+    const responseBuilt = await buildResponse({requestHandlers, ctx});
+
     // More infos about `next()`:
     //  - https://github.com/koajs/koa/blob/master/docs/guide.md#response-middleware
-    await next();
+    assert.internal([true, false].includes(responseBuilt));
+    if( responseBuilt===false ) {
+      await next();
+      return;
+    }
+    if( responseBuilt===true ) {
+      return;
+    }
+    assert.internal(false);
   });
 
   return router.routes();

@@ -11,6 +11,7 @@ function ExpressAdapter(handlers) {
 
   async function universalAdapter(req, res, next) {
     const responseBuilt = await handleResponse(req, res);
+
     assert.internal([true, false].includes(responseBuilt) || responseBuilt.err);
     if( responseBuilt===false ) {
       next();
