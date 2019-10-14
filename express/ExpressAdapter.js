@@ -21,7 +21,7 @@ function ExpressAdapter(handlers) {
       return;
     }
     if( responseBuilt.err ) {
-      next(err);
+      next(responseBuilt.err);
       return;
     }
     assert.internal(false);
