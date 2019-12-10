@@ -20,18 +20,10 @@ function getRequestHandlers(handlers) {
 
   handlerList.forEach(handler => {
     assert.usage(isCallable(handler));
-    const requestHandler = function(requestProps) {
-      assert.internal(arguments.length===1);
+    const requestHandler = function(requestObject, {requestProps}) {
       assert_requestProps(requestProps);
       const urlProps = getUrlProps(requestProps.url);
-      return handler({
-        ...requestProps,
-        ...urlProps,
-        __sources: {
-          requestProps,
-          urlProps,
-        },
-      });
+      return handler(requestObject, {requestProps, urlProps});
     };
     requestHandler.name = handler.name;
     requestHandler.executionPriority = handler.executionPriority;
@@ -61,9 +53,10 @@ function sortHandlers(handlers) {
 }
 
 function assert_requestProps(requestProps) {
-  // `headers` should be an array,
-  // but server frameworks seem to always return an object instead.
-  assert.internal(requestProps.headers.constructor===Object);
+  assert.internal('method' in requestProps);
+  assert.internal('url' in requestProps);
+  assert.internal('headers' in requestProps);
+  assert.internal('body' in requestProps);
 
   assert.internal(
     [
@@ -80,9 +73,13 @@ function assert_requestProps(requestProps) {
     .includes(requestProps.method)
   );
 
-  // `url` should be a URL that contains hostname & origin
+  // `url` should be the full URL with hostname and origin
   const {url} = requestProps;
   const urlProps = getUrlProps(url);
   assert.internal(urlProps.hostname);
   assert.internal(url.startsWith('http'));
+
+  // `headers` should be an array,
+  // but server frameworks seem to always return an object instead.
+  assert.internal(requestProps.headers.constructor===Object);
 }

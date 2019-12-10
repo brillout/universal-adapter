@@ -40,16 +40,12 @@ async function buildResponse({requestHandlers, req, res}) {
     assert.usage(requestHandlers);
     assert.usage(req);
     assert.usage(res);
-
-    const requestObject = {
-      ...req,
-      ...getRequestProps(req),
-    };
+    const requestProps = getRequestProps(req);
 
     for(const requestHandler of requestHandlers) {
       let handlerResult;
       try {
-        handlerResult = await requestHandler(requestObject);
+        handlerResult = await requestHandler(req, {requestProps});
       } catch(err) {
         return {err};
       }
@@ -59,10 +55,14 @@ async function buildResponse({requestHandlers, req, res}) {
         continue;
       }
 
-      const {body, headers, redirect, statusCode/*, etag*/, contentType} = responseObject;
+      const {body, headers, redirect, statusCode, etag, contentType} = responseObject;
 
       assert.internal(!res.headersSent);
       headers.forEach(({name, value}) => res.set(name, value));
+
+      if( etag ) {
+        res.set('ETag', '"'+etag+'"');
+      }
 
       if( statusCode ) {
         res.status(statusCode);
@@ -87,11 +87,15 @@ function getRequestProps(req) {
   const url = getRequestUrl();
   const method = getRequestMethod();
   const headers = getRequestHeaders();
+  const body = getRequestBody();
 
   const requestProps = {
     url,
     method,
     headers,
+    body,
+    isExpressFramework: true,
+    isUniversalAdapter: true,
   };
   return requestProps;
 
@@ -115,6 +119,11 @@ function getRequestProps(req) {
     const {headers} = req;
     assert.internal(headers.constructor===Object);
     return headers;
+  }
+
+  function getRequestBody() {
+    const {body} = req;
+    return body;
   }
 }
 

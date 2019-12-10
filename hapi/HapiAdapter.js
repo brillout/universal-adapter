@@ -9,15 +9,15 @@ const HapiUrl = require('hapi-url');
 module.exports = HapiAdapter;
 // module.exports.buildResponse = buildResponse;
 
-function HapiAdapter(handlers, {useOnPreResponse=false}={}) {
+function HapiAdapter(handlers, {useOnPreResponse=false, path='/{param*}'}={}) {
   const HapiPlugin = {
     name: 'HapiAdapter',
-    multiple: false,
+    multiple: true,
     register: server => {
       if( ! useOnPreResponse ) {
         server.route({
           method: '*',
-          path: '/{param*}',
+          path,
           handler: catchAllRoute,
         });
       } else {
@@ -30,7 +30,6 @@ function HapiAdapter(handlers, {useOnPreResponse=false}={}) {
   return HapiPlugin;
 
   async function catchAllRoute(request, h) {
-
     // TODO re-work this
     if( isAlreadyServed(request) ) {
         return h.continue;
@@ -64,15 +63,12 @@ async function buildResponse({requestHandlers, request, h}) {
     assert.usage(request && request.raw && request.raw.req);
     assert.usage(h && h.continue);
 
-    const requestObject = {
-      ...request,
-      ...getRequestProps(request),
-    };
+    const requestProps = getRequestProps(request);
 
     for(const requestHandler of requestHandlers) {
       const responseObject = (
         getResponseObject(
-          await requestHandler(requestObject),
+          await requestHandler(request, {requestProps}),
           {extractEtagHeader: true}
         )
       );
@@ -117,11 +113,15 @@ function getRequestProps(request) {
   const url = getRequestUrl();
   const method = getRequestMethod();
   const headers = getRequestHeaders();
+  const body = getRequestBody();
 
   const requestProps = {
     url,
     method,
     headers,
+    body,
+    isHapiFramework: true,
+    isUniversalAdapter: true,
   };
   return requestProps;
 
@@ -145,6 +145,11 @@ function getRequestProps(request) {
     const {headers} = request.raw.req;
     assert.internal(headers.constructor===Object);
     return headers;
+  }
+
+  function getRequestBody() {
+    const {payload} = request;
+    return payload;
   }
 }
 

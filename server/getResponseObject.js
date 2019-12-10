@@ -9,7 +9,7 @@ function getResponseObject(responseSpec, {extractEtagHeader=false}={}) {
 
   Object.keys(responseSpec)
   .forEach(respArg => {
-    const argList = ['body', 'headers', 'redirect', 'statusCode', 'type'];
+    const argList = ['body', 'headers', 'redirect', 'statusCode', 'contentType', 'etag'];
     assert.usage(
       argList.includes(respArg),
       responseSpec,
@@ -65,23 +65,33 @@ function getResponseObject(responseSpec, {extractEtagHeader=false}={}) {
   }
 
   {
+    const {etag} = responseSpec;
+    assert.warning(
+      etag===undefined || etag && etag.constructor===String,
+      "response `etag` is not a String",
+      {etag},
+    );
+    responseObject.etag = etag;
+  }
+
+  {
     const {redirect} = responseSpec;
     assert.warning(
       redirect===undefined || redirect && redirect.constructor===String,
       "response `redirect` is not a String",
-      redirect,
+      {redirect},
     );
     responseObject.redirect = redirect;
   }
 
   {
-    const {type} = responseSpec;
+    const {contentType} = responseSpec;
     assert.warning(
-      type===undefined || type && type.constructor===String,
-      "response `type` is not a String",
-      type,
+      contentType===undefined || contentType && contentType.constructor===String,
+      "response `contentType` is not a String",
+      {contentType},
     );
-    responseObject.type = type;
+    responseObject.contentType = contentType;
   }
 
   assert.warning(

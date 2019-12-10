@@ -31,15 +31,12 @@ function KoaAdapter(handlers) {
 }
 
 async function buildResponse({requestHandlers, ctx}) {
-  const requestObject = {
-    ...ctx,
-    ...getRequestProps(ctx),
-  };
+  const requestProps = getRequestProps(ctx);
 
   for(const requestHandler of requestHandlers) {
     const responseObject = (
       getResponseObject(
-        await requestHandler(requestObject),
+        await requestHandler(ctx, {requestProps}),
         {extractEtagHeader: true}
       )
     );
@@ -84,11 +81,15 @@ function getRequestProps(ctx) {
   const url = getRequestUrl();
   const method = getRequestMethod();
   const headers = getRequestHeaders();
+  const body = getRequestBody();
 
   const requestProps = {
     url,
     method,
     headers,
+    body,
+    isKoaFramework: true,
+    isUniversalAdapter: true,
   };
   return requestProps;
 
@@ -109,5 +110,10 @@ function getRequestProps(ctx) {
     const {headers} = ctx;
     assert.internal(headers.constructor===Object);
     return headers;
+  }
+
+  function getRequestBody() {
+    const {body} = ctx.request;
+    return body;
   }
 }

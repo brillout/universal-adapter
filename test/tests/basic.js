@@ -7,7 +7,7 @@ module.exports = [
   },
 ];
 
-async function handler({pathname, method}) {
+async function handler(requestObject, {urlProps: {pathname}, requestProps: {method}}) {
   if( method!=='GET' || !pathname.startsWith('/hello/') ) {
     return null;
   }

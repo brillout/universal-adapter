@@ -12,7 +12,7 @@ module.exports = [
 ];
 
 handlerFallback.executionPriority = -1;
-async function handlerFallback({pathname, method}) {
+async function handlerFallback(requestObject, {urlProps: {pathname}, requestProps: {method}}) {
   if( method!=='GET' ) {
     return null;
   }
@@ -22,7 +22,7 @@ async function handlerFallback({pathname, method}) {
 }
 
 handlerHighPrio.executionPriority = 1;
-async function handlerHighPrio({pathname, method}) {
+async function handlerHighPrio(requestObject, {urlProps: {pathname}, requestProps: {method}}) {
   if( method!=='GET' || pathname!=='/high-prio') {
     return null;
   }
@@ -32,7 +32,7 @@ async function handlerHighPrio({pathname, method}) {
 }
 
 handlerLowPrio.executionPriority = 0;
-async function handlerLowPrio({pathname, method}) {
+async function handlerLowPrio(requestObject, {urlProps: {pathname}, requestProps: {method}}) {
   if( method!=='GET' || !pathname.startsWith('/high')) {
     return null;
   }
