@@ -94,8 +94,7 @@ function getRequestProps(req) {
     method,
     headers,
     body,
-    isExpressFramework: true,
-    isUniversalAdapter: true,
+    comesFromUniversalAdapter: 'express',
   };
   return requestProps;
 
