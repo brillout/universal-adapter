@@ -88,7 +88,6 @@ function getRequestProps(ctx) {
     method,
     headers,
     body,
-    comesFromUniversalAdapter: 'koa',
   };
   return requestProps;
 

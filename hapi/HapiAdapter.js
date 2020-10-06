@@ -120,7 +120,6 @@ function getRequestProps(request) {
     method,
     headers,
     body,
-    comesFromUniversalAdapter: 'hapi',
   };
   return requestProps;
 
