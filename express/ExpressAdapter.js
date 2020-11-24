@@ -49,7 +49,7 @@ async function buildResponse({ requestHandlers, req, res }) {
       return { err };
     }
     const responseObject = getResponseObject(handlerResult, {
-      extractEtagHeader: false,
+      extractEtagHeader: true,
     });
 
     if (responseObject === null) {

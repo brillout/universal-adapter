@@ -14,7 +14,6 @@ function getResponseObject(responseSpec, { extractEtagHeader = false } = {}) {
       "redirect",
       "statusCode",
       "contentType",
-      "etag",
     ];
     assert.usage(
       argList.includes(respArg),
@@ -69,16 +68,6 @@ function getResponseObject(responseSpec, { extractEtagHeader = false } = {}) {
         }
         return true;
       }
-    );
-    responseObject.etag = etag;
-  }
-
-  {
-    const { etag } = responseSpec;
-    assert.warning(
-      etag === undefined || (etag && etag.constructor === String),
-      "response `etag` is not a String",
-      { etag }
     );
     responseObject.etag = etag;
   }
