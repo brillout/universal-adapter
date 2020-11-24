@@ -1,19 +1,18 @@
-const assert = require('@brillout/reassert');
+const assert = require("@brillout/reassert");
 
 module.exports = [
   {
-    handlers: [
-      handlerFallback,
-      handlerHighPrio,
-      handlerLowPrio,
-    ],
+    handlers: [handlerFallback, handlerHighPrio, handlerLowPrio],
     test,
   },
 ];
 
 handlerFallback.executionPriority = -1;
-async function handlerFallback(requestObject, {urlProps: {pathname}, requestProps: {method}}) {
-  if( method!=='GET' ) {
+async function handlerFallback(
+  requestObject,
+  { urlProps: { pathname }, requestProps: { method } }
+) {
+  if (method !== "GET") {
     return null;
   }
   return {
@@ -22,8 +21,11 @@ async function handlerFallback(requestObject, {urlProps: {pathname}, requestProp
 }
 
 handlerHighPrio.executionPriority = 1;
-async function handlerHighPrio(requestObject, {urlProps: {pathname}, requestProps: {method}}) {
-  if( method!=='GET' || pathname!=='/high-prio') {
+async function handlerHighPrio(
+  requestObject,
+  { urlProps: { pathname }, requestProps: { method } }
+) {
+  if (method !== "GET" || pathname !== "/high-prio") {
     return null;
   }
   return {
@@ -32,8 +34,11 @@ async function handlerHighPrio(requestObject, {urlProps: {pathname}, requestProp
 }
 
 handlerLowPrio.executionPriority = 0;
-async function handlerLowPrio(requestObject, {urlProps: {pathname}, requestProps: {method}}) {
-  if( method!=='GET' || !pathname.startsWith('/high')) {
+async function handlerLowPrio(
+  requestObject,
+  { urlProps: { pathname }, requestProps: { method } }
+) {
+  if (method !== "GET" || !pathname.startsWith("/high")) {
     return null;
   }
   return {
@@ -41,21 +46,19 @@ async function handlerLowPrio(requestObject, {urlProps: {pathname}, requestProps
   };
 }
 
-async function test({fetch}) {
-  const highPrioMsg = await fetch('/high-prio');
-  const lowPrioMsg = await fetch('/high-prio-2');
-  const fallbackMsg = await fetch('/some-route');
+async function test({ fetch }) {
+  const highPrioMsg = await fetch("/high-prio");
+  const lowPrioMsg = await fetch("/high-prio-2");
+  const fallbackMsg = await fetch("/some-route");
 
   assert(
-    (
-      highPrioMsg==="I'm high prio" &&
-      lowPrioMsg==="I'm low prio" &&
-      fallbackMsg==="I'm fallback"
-    ),
+    highPrioMsg === "I'm high prio" &&
+      lowPrioMsg === "I'm low prio" &&
+      fallbackMsg === "I'm fallback",
     {
       highPrioMsg,
       lowPrioMsg,
       fallbackMsg,
-    },
+    }
   );
 }

@@ -1,20 +1,26 @@
-const assert = require('@brillout/reassert');
+const assert = require("@brillout/reassert");
 
 module.exports = getResponseObject;
 
-function getResponseObject(responseSpec, {extractEtagHeader=false}={}) {
-  if( responseSpec === null ) {
+function getResponseObject(responseSpec, { extractEtagHeader = false } = {}) {
+  if (responseSpec === null) {
     return null;
   }
 
-  Object.keys(responseSpec)
-  .forEach(respArg => {
-    const argList = ['body', 'headers', 'redirect', 'statusCode', 'contentType', 'etag'];
+  Object.keys(responseSpec).forEach((respArg) => {
+    const argList = [
+      "body",
+      "headers",
+      "redirect",
+      "statusCode",
+      "contentType",
+      "etag",
+    ];
     assert.usage(
       argList.includes(respArg),
       responseSpec,
       Object.keys(responseSpec),
-      "Unknown argument `"+respArg+"` in response object printed above.",
+      "Unknown argument `" + respArg + "` in response object printed above.",
       "The list of known arguments is:",
       argList
     );
@@ -23,7 +29,7 @@ function getResponseObject(responseSpec, {extractEtagHeader=false}={}) {
   const responseObject = {};
 
   {
-    const {body} = responseSpec;
+    const { body } = responseSpec;
     assert.warning(
       !body || [String, Buffer].includes(body.constructor),
       body,
@@ -34,24 +40,27 @@ function getResponseObject(responseSpec, {extractEtagHeader=false}={}) {
   }
 
   {
-    const {headers=[]} = responseSpec;
+    const { headers = [] } = responseSpec;
     assert.usage(headers && headers.forEach, headers);
-    headers.forEach(headerSpec => {
-      assert.usage(headerSpec && headerSpec.name && headerSpec.value, headers, headerSpec);
+    headers.forEach((headerSpec) => {
+      assert.usage(
+        headerSpec && headerSpec.name && headerSpec.value,
+        headers,
+        headerSpec
+      );
     });
     responseObject.headers = headers;
   }
 
-  if( extractEtagHeader ) {
+  if (extractEtagHeader) {
     let etag;
-    responseObject.headers = (
-      responseObject.headers
-      .filter(({name, value}) => {
-        const isEtagHeader = name.toLowerCase()==='etag';
-     // const isEtagHeader = name==='ETag';
-        if( isEtagHeader ) {
+    responseObject.headers = responseObject.headers.filter(
+      ({ name, value }) => {
+        const isEtagHeader = name.toLowerCase() === "etag";
+        // const isEtagHeader = name==='ETag';
+        if (isEtagHeader) {
           assert.warning(
-            value[0]==='"' && value.slice(-1)[0]==='"',
+            value[0] === '"' && value.slice(-1)[0] === '"',
             "Malformatted etag",
             value
           );
@@ -59,37 +68,38 @@ function getResponseObject(responseSpec, {extractEtagHeader=false}={}) {
           return false;
         }
         return true;
-      })
+      }
     );
     responseObject.etag = etag;
   }
 
   {
-    const {etag} = responseSpec;
+    const { etag } = responseSpec;
     assert.warning(
-      etag===undefined || etag && etag.constructor===String,
+      etag === undefined || (etag && etag.constructor === String),
       "response `etag` is not a String",
-      {etag},
+      { etag }
     );
     responseObject.etag = etag;
   }
 
   {
-    const {redirect} = responseSpec;
+    const { redirect } = responseSpec;
     assert.warning(
-      redirect===undefined || redirect && redirect.constructor===String,
+      redirect === undefined || (redirect && redirect.constructor === String),
       "response `redirect` is not a String",
-      {redirect},
+      { redirect }
     );
     responseObject.redirect = redirect;
   }
 
   {
-    const {contentType} = responseSpec;
+    const { contentType } = responseSpec;
     assert.warning(
-      contentType===undefined || contentType && contentType.constructor===String,
+      contentType === undefined ||
+        (contentType && contentType.constructor === String),
       "response `contentType` is not a String",
-      {contentType},
+      { contentType }
     );
     responseObject.contentType = contentType;
   }
@@ -97,14 +107,13 @@ function getResponseObject(responseSpec, {extractEtagHeader=false}={}) {
   assert.warning(
     !responseObject.body || !responseObject.redirect,
     "The response printed above has both a `body` and a `redirect` which doesn't make sense.",
-    "The body will never be shown as the page will be redirected.",
+    "The body will never be shown as the page will be redirected."
   );
 
   {
-    const {statusCode} = responseSpec;
+    const { statusCode } = responseSpec;
     responseObject.statusCode = statusCode;
   }
 
   return responseObject;
 }
-

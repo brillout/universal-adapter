@@ -1,26 +1,25 @@
-const assert = require('@brillout/reassert');
+const assert = require("@brillout/reassert");
 
-const getResponseObject = require('@universal-adapter/server/getResponseObject');
-const getRequestHandlers = require('@universal-adapter/server/getRequestHandlers');
+const getResponseObject = require("@universal-adapter/server/getResponseObject");
+const getRequestHandlers = require("@universal-adapter/server/getRequestHandlers");
 
 module.exports = ExpressAdapter;
 
 function ExpressAdapter(handlers) {
-
   return universalAdapter;
 
   async function universalAdapter(req, res, next) {
     const responseBuilt = await handleResponse(req, res);
 
     assert.internal([true, false].includes(responseBuilt) || responseBuilt.err);
-    if( responseBuilt===false ) {
+    if (responseBuilt === false) {
       next();
       return;
     }
-    if( responseBuilt===true ) {
+    if (responseBuilt === true) {
       return;
     }
-    if( responseBuilt.err ) {
+    if (responseBuilt.err) {
       next(responseBuilt.err);
       return;
     }
@@ -29,58 +28,67 @@ function ExpressAdapter(handlers) {
 
   async function handleResponse(req, res) {
     const requestHandlers = getRequestHandlers(handlers);
-    if( alreadyServed(res) ) {
+    if (alreadyServed(res)) {
       return false;
     }
-    return await buildResponse({requestHandlers, req, res});
+    return await buildResponse({ requestHandlers, req, res });
   }
 }
 
-async function buildResponse({requestHandlers, req, res}) {
-    assert.usage(requestHandlers);
-    assert.usage(req);
-    assert.usage(res);
-    const requestProps = getRequestProps(req);
+async function buildResponse({ requestHandlers, req, res }) {
+  assert.usage(requestHandlers);
+  assert.usage(req);
+  assert.usage(res);
+  const requestProps = getRequestProps(req);
 
-    for(const requestHandler of requestHandlers) {
-      let handlerResult;
-      try {
-        handlerResult = await requestHandler(req, {requestProps});
-      } catch(err) {
-        return {err};
-      }
-      const responseObject = getResponseObject(handlerResult, {extractEtagHeader: false});
-
-      if( responseObject === null ) {
-        continue;
-      }
-
-      const {body, headers, redirect, statusCode, etag, contentType} = responseObject;
-
-      assert.internal(!res.headersSent);
-      headers.forEach(({name, value}) => res.set(name, value));
-
-      if( etag ) {
-        res.set('ETag', '"'+etag+'"');
-      }
-
-      if( statusCode ) {
-        res.status(statusCode);
-      }
-
-      if( contentType ) {
-        res.type(contentType);
-      }
-
-      if( redirect ) {
-        res.redirect(redirect);
-      } else {
-        res.send(body);
-      }
-
-      return true;
+  for (const requestHandler of requestHandlers) {
+    let handlerResult;
+    try {
+      handlerResult = await requestHandler(req, { requestProps });
+    } catch (err) {
+      return { err };
     }
-    return false;
+    const responseObject = getResponseObject(handlerResult, {
+      extractEtagHeader: false,
+    });
+
+    if (responseObject === null) {
+      continue;
+    }
+
+    const {
+      body,
+      headers,
+      redirect,
+      statusCode,
+      etag,
+      contentType,
+    } = responseObject;
+
+    assert.internal(!res.headersSent);
+    headers.forEach(({ name, value }) => res.set(name, value));
+
+    if (etag) {
+      res.set("ETag", '"' + etag + '"');
+    }
+
+    if (statusCode) {
+      res.status(statusCode);
+    }
+
+    if (contentType) {
+      res.type(contentType);
+    }
+
+    if (redirect) {
+      res.redirect(redirect);
+    } else {
+      res.send(body);
+    }
+
+    return true;
+  }
+  return false;
 }
 
 function getRequestProps(req) {
@@ -99,28 +107,28 @@ function getRequestProps(req) {
 
   function getRequestUrl() {
     // https://stackoverflow.com/questions/10183291/how-to-get-the-full-url-in-express
-    const {protocol, originalUrl} = req;
-    assert.internal(protocol.startsWith('http'));
-    const host = req.get && req.get('host');
+    const { protocol, originalUrl } = req;
+    assert.internal(protocol.startsWith("http"));
+    const host = req.get && req.get("host");
     assert.internal(host);
-    const url = protocol + '://' + host + originalUrl;
+    const url = protocol + "://" + host + originalUrl;
     return url;
   }
 
   function getRequestMethod() {
-    const {method} = req;
-    assert.internal(method.constructor===String);
+    const { method } = req;
+    assert.internal(method.constructor === String);
     return method;
   }
 
   function getRequestHeaders() {
-    const {headers} = req;
-    assert.internal(headers.constructor===Object);
+    const { headers } = req;
+    assert.internal(headers.constructor === Object);
     return headers;
   }
 
   function getRequestBody() {
-    const {body} = req;
+    const { body } = req;
     return body;
   }
 }
