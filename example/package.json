@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "example",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "dependencies": {
-    "@universal-adapter/express": "0.7.1",
-    "@universal-adapter/hapi": "0.7.1",
-    "@universal-adapter/koa": "0.7.1",
+    "@universal-adapter/express": "0.7.2",
+    "@universal-adapter/hapi": "0.7.2",
+    "@universal-adapter/koa": "0.7.2",
     "express": "^4.16.4",
     "hapi": "^17.8.1",
     "koa": "^2.6.2"
