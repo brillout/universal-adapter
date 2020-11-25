@@ -58,7 +58,7 @@ async function buildResponse({ requestHandlers, req, res }) {
 
     const {
       body,
-      headersMap,
+      headers,
       redirect,
       statusCode,
       etag,
@@ -66,12 +66,12 @@ async function buildResponse({ requestHandlers, req, res }) {
     } = responseObject;
 
     assert.internal(!res.headersSent);
-    Object.entries(headersMap).forEach(([name, values]) => {
+    Object.entries(headers).forEach(([name, values]) =>
       // res.setHeader() is a native method of Node.js
       //  - https://stackoverflow.com/questions/40840852/difference-between-res-setheader-and-res-header-in-node-js
       //  - https://stackoverflow.com/questions/39397983/how-do-i-set-multiple-http-header-fields-with-the-same-key-in-node-js
-      res.setHeader(name, values);
-    });
+      res.setHeader(name, values)
+    );
 
     if (etag) {
       res.set("ETag", '"' + etag + '"');

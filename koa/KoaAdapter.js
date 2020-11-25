@@ -52,7 +52,7 @@ async function buildResponse({ requestHandlers, ctx }) {
       contentType,
     } = responseObject;
 
-    headers.forEach((header) => ctx.set(header.name, header.value));
+    Object.entries(headers).forEach(([name, values]) => ctx.set(name, values));
 
     if (etag) {
       ctx.set("ETag", etag);

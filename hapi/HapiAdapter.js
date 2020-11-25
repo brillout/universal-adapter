@@ -89,7 +89,9 @@ async function buildResponse({ requestHandlers, request, h }) {
 
     const resp = h.response(body);
 
-    headers.forEach(({ name, value }) => resp.header(name, value));
+    Object.entries(headers).forEach(([name, values]) =>
+      resp.header(name, values)
+    );
 
     if (etag) {
       const resp_304 = h.entity({ etag });

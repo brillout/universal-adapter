@@ -39,13 +39,14 @@ function getResponseObject(responseSpec, { extractEtagHeader = false } = {}) {
   }
 
   {
-    const { headers = [] } = responseSpec;
-    assert.usage(headers && headers.forEach, headers);
-    headers.forEach((headerSpec) => {
+    const { headers = {} } = responseSpec;
+    assert.usage(headers instanceof Object && !("length" in headers), headers);
+    Object.entries(headers).forEach(([_, values]) => {
       assert.usage(
-        headerSpec && headerSpec.name && headerSpec.value,
-        headers,
-        headerSpec
+        values &&
+          values.constructor === Array &&
+          values.every((val) => typeof val === "string"),
+        values
       );
     });
     responseObject.headers = headers;
@@ -53,32 +54,25 @@ function getResponseObject(responseSpec, { extractEtagHeader = false } = {}) {
 
   if (extractEtagHeader) {
     let etag;
-    responseObject.headers = responseObject.headers.filter(
-      ({ name, value }) => {
+    responseObject.headers = Object.entries(responseObject.headers).filter(
+      ([name, values]) => {
         const isEtagHeader = name.toLowerCase() === "etag";
         // const isEtagHeader = name==='ETag';
         if (isEtagHeader) {
+          assert.warning(values.length === 1, values);
+          const val = values[0];
           assert.warning(
-            value[0] === '"' && value.slice(-1)[0] === '"',
+            val[0] === '"' && val.slice(-1)[0] === '"',
             "Malformatted etag",
-            value
+            val
           );
-          etag = value.slice(1, -1);
+          etag = val.slice(1, -1);
           return false;
         }
         return true;
       }
     );
     responseObject.etag = etag;
-  }
-
-  {
-    const headersMap = [];
-    responseObject.headers.forEach(({ name, value }) => {
-      headersMap[name] = headersMap[name] || [];
-      headersMap[name].push(value);
-    });
-    responseObject.headersMap = headersMap;
   }
 
   {
