@@ -73,6 +73,15 @@ function getResponseObject(responseSpec, { extractEtagHeader = false } = {}) {
   }
 
   {
+    const headersMap = [];
+    responseObject.headers.forEach(({ name, value }) => {
+      headersMap[name] = headersMap[name] || [];
+      headersMap[name].push(value);
+    });
+    responseObject.headersMap = headersMap;
+  }
+
+  {
     const { redirect } = responseSpec;
     assert.warning(
       redirect === undefined || (redirect && redirect.constructor === String),
