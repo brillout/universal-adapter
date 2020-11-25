@@ -41,12 +41,12 @@ function getResponseObject(responseSpec, { extractEtagHeader = false } = {}) {
   {
     const { headers = {} } = responseSpec;
     assert.usage(headers instanceof Object && !("length" in headers), headers);
-    Object.entries(headers).forEach(([_, values]) => {
+    Object.entries(headers).forEach(([_, headerValues]) => {
       assert.usage(
-        values &&
-          values.constructor === Array &&
-          values.every((val) => typeof val === "string"),
-        values
+        headerValues &&
+          headerValues.constructor === Array &&
+          headerValues.every((val) => typeof val === "string"),
+        headerValues
       );
     });
     responseObject.headers = headers;
@@ -54,24 +54,26 @@ function getResponseObject(responseSpec, { extractEtagHeader = false } = {}) {
 
   if (extractEtagHeader) {
     let etag;
-    responseObject.headers = Object.entries(responseObject.headers).filter(
-      ([name, values]) => {
-        const isEtagHeader = name.toLowerCase() === "etag";
-        // const isEtagHeader = name==='ETag';
-        if (isEtagHeader) {
-          assert.warning(values.length === 1, values);
-          const val = values[0];
-          assert.warning(
-            val[0] === '"' && val.slice(-1)[0] === '"',
-            "Malformatted etag",
-            val
-          );
-          etag = val.slice(1, -1);
-          return false;
-        }
-        return true;
+    const { headers } = responseObject;
+    const headers_filtered = { ...headers };
+    Object.entries(headers).filter(([headerName, headerValues]) => {
+      const isEtagHeader = headerName.toLowerCase() === "etag";
+      // const isEtagHeader = headerName==='ETag';
+      if (isEtagHeader) {
+        assert.warning(headerValues.length === 1, headerValues);
+        const val = headerValues[0];
+        assert.warning(
+          val[0] === '"' && val.slice(-1)[0] === '"',
+          "Malformatted etag",
+          val
+        );
+        etag = val.slice(1, -1);
+        delete headers_filtered[headerName];
+        return false;
       }
-    );
+      return true;
+    });
+    responseObject.headers = headers_filtered;
     responseObject.etag = etag;
   }
 
