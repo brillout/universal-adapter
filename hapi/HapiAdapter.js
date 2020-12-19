@@ -4,7 +4,6 @@ const getResponseObject = require("@universal-adapter/server/getResponseObject")
 const getRequestHandlers = require("@universal-adapter/server/getRequestHandlers");
 
 const Boom = require("boom");
-const HapiUrl = require("hapi-url");
 
 module.exports = HapiAdapter;
 // module.exports.buildResponse = buildResponse;
@@ -134,12 +133,8 @@ function getRequestProps(request) {
   return requestProps;
 
   function getRequestUrl() {
-    // https://stackoverflow.com/questions/31840286/how-to-get-the-full-url-for-a-request-in-hapi
-    /* The accepected answer doesn't work:
-    const url = `${request.headers['x-forwarded-proto'] || request.connection.info.protocol}://${request.info.host}${request.url.path}`;
-    */
-    const url = HapiUrl.current(request);
-    assert.internal(url.startsWith("http"));
+    const url = request.url.pathname;
+    assert.internal(url.startsWith("/"));
     return url;
   }
 

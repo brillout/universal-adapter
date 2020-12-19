@@ -97,9 +97,8 @@ function getRequestProps(ctx) {
   return requestProps;
 
   function getRequestUrl() {
-    // https://github.com/koajs/koa/blob/master/docs/api/request.md#requesthref
-    const url = ctx.request.href;
-    assert.internal(url.startsWith("http"));
+    const url = ctx.request.originalUrl;
+    assert.internal(url.startsWith("/"));
     return url;
   }
 

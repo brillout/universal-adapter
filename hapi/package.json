@@ -5,8 +5,7 @@
   "dependencies": {
     "@brillout/reassert": "^0.1.1",
     "@universal-adapter/server": "0.7.3",
-    "boom": "^7.2.0",
-    "hapi-url": "^1.0.2"
+    "boom": "^7.2.0"
   },
   "description": "Universal Server Adapter - Hapi",
   "repository": "github:brillout/universal-adapter",

@@ -74,8 +74,8 @@ function assert_requestProps(requestProps) {
   // `url` should be the full URL with hostname and origin
   const { url } = requestProps;
   const urlProps = getUrlProps(url);
-  assert.internal(urlProps.hostname);
-  assert.internal(url.startsWith("http"));
+  assert.internal(!urlProps.hostname);
+  assert.internal(url.startsWith("/"));
 
   // `headers` should be an array,
   // but server frameworks seem to always return an object instead.

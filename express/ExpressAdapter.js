@@ -111,12 +111,9 @@ function getRequestProps(req) {
   return requestProps;
 
   function getRequestUrl() {
-    // https://stackoverflow.com/questions/10183291/how-to-get-the-full-url-in-express
-    const { protocol, originalUrl } = req;
-    assert.internal(protocol.startsWith("http"));
-    const host = req.get && req.get("host");
-    assert.internal(host);
-    const url = protocol + "://" + host + originalUrl;
+    // `req.originalUrl` vs `req.url`: https://stackoverflow.com/questions/24613816/difference-between-req-url-and-req-originalurl-in-express-js-version-4/62635985#62635985
+    const url = req.originalUrl;
+    assert.internal(url.startsWith("/"));
     return url;
   }
 
