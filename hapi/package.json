@@ -9,6 +9,7 @@
   },
   "description": "Universal Server Adapter - Hapi",
   "repository": "github:brillout/universal-adapter",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
   }

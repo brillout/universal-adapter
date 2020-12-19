@@ -7,6 +7,7 @@
   },
   "description": "Universal Server Adapter Interface",
   "repository": "github:brillout/universal-adapter",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
   }

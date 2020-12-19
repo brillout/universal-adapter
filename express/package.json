@@ -8,6 +8,7 @@
   },
   "description": "Universal Server Adapter - Express",
   "repository": "github:brillout/universal-adapter",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
   }
