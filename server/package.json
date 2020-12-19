@@ -1,6 +1,6 @@
 {
   "name": "@universal-adapter/server",
-  "version": "0.7.3",
+  "version": "0.8.0",
   "dependencies": {
     "@brillout/reassert": "^0.1.1",
     "@brillout/url-props": "^0.1.1"
